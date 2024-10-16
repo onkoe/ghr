@@ -42,6 +42,24 @@ impl Report {
 
         Ok(OperatingSystemInfo::new(name, release, arch, other_info))
     }
+
+    /// Grabs operating system info for the hardware report.
+    #[cfg(target_os = "windows")]
+    pub(crate) fn os_info() -> OsInfoReturnType {
+        let ver = windows_version::OsVersion::current();
+
+        // use a simple env variable to grab this.
+        // it's always around on Windows i guess!
+        let arch = std::env::var("PROCESSOR_ARCHITECTURE")
+            .map_err(|e| GhrError::OsInfoInaccessible(e.to_string()))?;
+
+        Ok(OperatingSystemInfo {
+            name: "Windows".into(),
+            version: format!("{}.{}.{}", ver.major, ver.minor, ver.build),
+            architecture: arch,
+            other: BTreeMap::new(),
+        })
+    }
 }
 
 #[cfg(test)]
