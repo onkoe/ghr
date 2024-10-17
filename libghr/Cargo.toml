@@ -8,6 +8,7 @@ rust-version = "1.81"
 argon2 = "0.5.3"
 base64 = "0.22.1"
 bs58 = "0.5.1"
+bytemuck = "1.19.0"
 mac_address = { version = "1.1.7", features = ["serde"] }
 pisserror = "0.2.3"
 rand = "0.8.5"
@@ -26,10 +27,12 @@ tracing = { version = "0.1.40", features = ["async-await"] }
 nix = { version = "0.29.0", features = ["feature"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows-core = "0.58"
+windows-core = "=0.58"
 windows = { version = "0.58", features = [
     "Win32_Devices",
     "Win32_Devices_DeviceAndDriverInstallation",
+    "Win32_System",
+    "Win32_System_Registry",
 ] }
 windows-version = "0.1.1"
 

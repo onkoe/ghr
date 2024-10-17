@@ -17,8 +17,10 @@ pub enum GhrError {
     #[error("To create a system report with a system identifier, you must have a non-loopback MAC address.")]
     NoMacAddresses,
 
-    #[error("Couldn't access hardware device information. (err: `{_0}`)")]
+    #[error("Couldn't access hardware device information. (err: {_0})")]
     ComponentInfoInaccessible(String),
+    #[error("Component info contained unexpected information. (err: {_0})")]
+    ComponentInfoWeirdInfo(String),
 
     // errors related to generally-unexpected failures
     #[error("Couldn't create a salt for the system identification hash. {ASK_USER_TO_REPORT} (err: {_0})")]
