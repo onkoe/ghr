@@ -1,0 +1,16 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+libghr = { path = "../libghr" }
+serde = { version = "1.0.210", default-features = false, features = ["alloc", "derive", "rc", "serde_derive", "std"] }
+actix-web = "4.9.0"
+tracing = { version = "0.1.40", features = ["async-await"] }
+tracing-subscriber = "0.3.18"
+dirs = "5.0.1"
+tokio-postgres = "0.7.12"
+clap = { version = "4.5.20", features = ["derive"] }
+anyhow = "1.0.89"
