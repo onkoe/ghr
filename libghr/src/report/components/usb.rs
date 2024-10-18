@@ -32,7 +32,7 @@ pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
             class,
             vendor_id,
             status: ComponentStatus {}, // TODO
-            desc: super::ComponentDescription::None,
+            desc: ComponentDescription::None,
         })
     }
 

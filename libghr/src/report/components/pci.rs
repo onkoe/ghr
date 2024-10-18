@@ -1,6 +1,5 @@
 //! pci
 
-use super::{ComponentBus, ComponentInfo, ComponentStatus};
 use crate::prelude::internal::*;
 
 use tokio::try_join;
@@ -32,7 +31,7 @@ pub async fn pci_components() -> GhrResult<Vec<ComponentInfo>> {
             class,
             vendor_id,
             status: ComponentStatus {}, // TODO
-            desc: super::ComponentDescription::None,
+            desc: ComponentDescription::None,
         })
     }
 

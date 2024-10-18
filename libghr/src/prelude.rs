@@ -2,8 +2,11 @@ pub(crate) mod internal {
     pub use crate::{
         error::{GhrError, GhrResult},
         report::{
-            components::ComponentInfo, machine::MachineInfo, os::OperatingSystemInfo,
-            system_config::SystemConfInfo, Report,
+            components::{ComponentBus, ComponentDescription, ComponentInfo, ComponentStatus},
+            machine::MachineInfo,
+            os::OperatingSystemInfo,
+            system_config::SystemConfInfo,
+            Report,
         },
     };
 }

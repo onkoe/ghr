@@ -1,6 +1,5 @@
 //! cpu info
 
-use super::{ComponentBus, ComponentInfo, ComponentStatus};
 use crate::prelude::internal::*;
 
 #[cfg(target_os = "linux")]
@@ -12,7 +11,6 @@ pub async fn cpu(system: &sysinfo::System) -> GhrResult<ComponentInfo> {
     use procfs::{CpuInfo, FromBufRead};
     use std::{fs::File, io::BufReader};
 
-    use crate::report::components::ComponentDescription;
 
     let cpu_info_file = PathBuf::from("/proc/cpuinfo");
     let rdr = BufReader::new(
