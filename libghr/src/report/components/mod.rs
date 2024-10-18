@@ -1,4 +1,3 @@
-use fraction::Decimal;
 use sysinfo::{CpuRefreshKind, RefreshKind};
 
 use crate::prelude::internal::*;

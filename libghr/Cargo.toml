@@ -7,12 +7,8 @@ rust-version = "1.81"
 [dependencies]
 argon2 = "0.5.3"
 base64 = "0.22.1"
-bs58 = "0.5.1"
-bytemuck = "1.19.0"
-fraction = { version = "0.15.3", features = ["serde", "serde_derive", "with-serde-support"] }
 mac_address = { version = "1.1.7", features = ["serde"] }
 pisserror = "0.2.3"
-procfs = "0.17.0"
 rand = "0.8.5"
 serde = { version = "1.0.210", default-features = false, features = [
     "alloc",
@@ -28,6 +24,8 @@ tracing = { version = "0.1.40", features = ["async-await"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 nix = { version = "0.29.0", features = ["feature"] }
+procfs = "0.17.0"
+
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-core = "=0.58"

@@ -9,7 +9,6 @@ pub async fn cpu(system: &sysinfo::System) -> GhrResult<ComponentInfo> {
 
     use std::path::PathBuf;
 
-    use fraction::Decimal;
     use procfs::{CpuInfo, FromBufRead};
     use std::{fs::File, io::BufReader};
 
