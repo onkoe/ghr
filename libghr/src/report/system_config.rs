@@ -1,5 +1,5 @@
 //! `system_config`: Info about the system's configuration
 
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
 pub struct SystemConfInfo {}

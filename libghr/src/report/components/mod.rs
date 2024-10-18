@@ -1,5 +1,9 @@
+use fraction::Decimal;
+use sysinfo::{CpuRefreshKind, RefreshKind};
+
 use crate::prelude::internal::*;
 
+pub mod cpu;
 pub mod pci;
 pub mod usb;
 
@@ -8,16 +12,21 @@ pub mod usb;
 /// Currently, this just supports USB and PCI. Additional device types will
 /// come soon!
 pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
-    let (usb, pci) = tokio::try_join! {
+    let system = sysinfo::System::new_with_specifics(
+        RefreshKind::new().with_cpu(CpuRefreshKind::everything()),
+    );
+
+    let (cpu, usb, pci) = tokio::try_join! {
+        cpu::cpu(&system),
         usb::usb_components(),
         pci::pci_components(),
     }?;
 
-    Ok([usb, pci].into_iter().flatten().collect())
+    Ok([vec![cpu], usb, pci].into_iter().flatten().collect())
 }
 
 /// A representation of any single component in the machine.
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
 pub struct ComponentInfo {
     /// The type of bus this component is from.
@@ -34,10 +43,13 @@ pub struct ComponentInfo {
 
     /// Status info about the component.
     status: ComponentStatus,
+
+    /// General information about the component.
+    desc: ComponentDescription,
 }
 
 /// The bus a component is on.
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
 pub enum ComponentBus {
     Pci,
@@ -56,9 +68,25 @@ pub enum ComponentBus {
 }
 
 /// Information about the health of the component.
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
 pub struct ComponentStatus {}
+
+/// A general 'description' about the component
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[non_exhaustive]
+pub enum ComponentDescription {
+    CpuDescription {
+        /// The CPU's clock speed in GHz. (ex: 3.4 GHz)
+        clock_speed: f64,
+
+        /// The CPU's core count.
+        core_ct: u32,
+    },
+
+    /// No description is available for this device.
+    None,
+}
 
 // all this helps with accessing devices on linux
 #[cfg(target_os = "linux")]

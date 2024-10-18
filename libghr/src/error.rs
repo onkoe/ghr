@@ -6,9 +6,7 @@ pub type GhrResult<T> = Result<T, GhrError>;
 const ASK_USER_TO_REPORT: &str = "This is a bug. Please report it!";
 
 /// An error that occurred when grabbing system/hardware information.
-#[derive(
-    Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize, Error,
-)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, Error)]
 #[non_exhaustive]
 pub enum GhrError {
     // function errors...

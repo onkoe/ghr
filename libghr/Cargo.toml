@@ -9,8 +9,10 @@ argon2 = "0.5.3"
 base64 = "0.22.1"
 bs58 = "0.5.1"
 bytemuck = "1.19.0"
+fraction = { version = "0.15.3", features = ["serde", "serde_derive", "with-serde-support"] }
 mac_address = { version = "1.1.7", features = ["serde"] }
 pisserror = "0.2.3"
+procfs = "0.17.0"
 rand = "0.8.5"
 serde = { version = "1.0.210", default-features = false, features = [
     "alloc",
@@ -19,6 +21,7 @@ serde = { version = "1.0.210", default-features = false, features = [
     "serde_derive",
     "std",
 ] }
+sysinfo = "0.32.0"
 tokio = { version = "1.40.0", features = ["fs", "macros"] }
 tokio-stream = { version = "0.1.16", features = ["fs"] }
 tracing = { version = "0.1.40", features = ["async-await"] }

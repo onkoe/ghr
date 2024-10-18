@@ -32,6 +32,7 @@ pub async fn pci_components() -> GhrResult<Vec<ComponentInfo>> {
             class,
             vendor_id,
             status: ComponentStatus {}, // TODO
+            desc: super::ComponentDescription::None,
         })
     }
 

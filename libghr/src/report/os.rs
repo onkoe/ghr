@@ -75,7 +75,7 @@ mod tests {
 /// Information describing the operating system that's currently running.
 ///
 /// On UNIX systems, this is derived from the `utsname` syscall.
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
 pub struct OperatingSystemInfo {
     name: String,
