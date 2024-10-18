@@ -1,0 +1,14 @@
+= Design
+
+We want to accept requests from the web directly, without giving the frontend access to the database whatsoever.
+
+To do so, we'll use Cloudflare on the front-end and then manually rate-limit users with Rocket.
+
+== Database
+
+The database is mostly here to store each `Report` directly. The schema needs to be somewhat untyped for this work correctly. (all our types are `#[non_exhaustive]`)
+
+However, we also want to store metadata about each report:
+
+* Datetime submitted
+* A unique identifier, not related to the created "HWID"

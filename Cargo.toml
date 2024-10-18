@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = ["backend", "libghr"]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Barrett Ray <contact@barretts.club>"]
+edition = "2021"
+rust-version = "1.80"
+repository = "https://github.com/onkoe/ghr"
+license-file = "LICENSE"
