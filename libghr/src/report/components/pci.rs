@@ -24,7 +24,7 @@ pub async fn pci_components() -> GhrResult<Vec<ComponentInfo>> {
             id,
             class,
             vendor_id,
-            status: ComponentStatus {}, // TODO
+            status: None, // TODO
             desc: ComponentDescription::None,
         })
     }
@@ -35,7 +35,7 @@ pub async fn pci_components() -> GhrResult<Vec<ComponentInfo>> {
 /// grabs the PCI class on Linux.
 #[tracing::instrument]
 #[cfg(target_os = "linux")]
-async fn pci_class(path: &Path) -> String {
+async fn pci_class(path: &Path) -> Option<String> {
     // we'll load its class
     let class = tokio::fs::read_to_string(path.join("class")).await;
 
@@ -49,7 +49,7 @@ async fn pci_class(path: &Path) -> String {
         (c, subc)
     }) else {
         tracing::warn!("Failed to find the class of this PCI device.");
-        return "Unknown".into();
+        return None;
     };
 
     // make sure we can convert it into a number
@@ -58,28 +58,28 @@ async fn pci_class(path: &Path) -> String {
         u8::from_str_radix(&subclass, 16),
     ) else {
         tracing::warn!("Class was not a number: {}", &class);
-        return "Unknown".into();
+        return None;
     };
 
     // we do! let's parse it for an ID we understand
     if let Some(parsed) = pci_ids::Subclass::from_cid_sid(class_num, subclass_num) {
-        return format!("{} ({})", parsed.class().name(), parsed.name());
+        return Some(format!("{} ({})", parsed.class().name(), parsed.name()));
     }
 
-    return class;
+    return Some(class);
 }
 
 /// grabs the PCI vendor and product names on Linux.
 #[tracing::instrument]
 #[cfg(target_os = "linux")]
-async fn pci_vendor_id(path: &Path) -> (String, String) {
+async fn pci_vendor_id(path: &Path) -> (Option<String>, Option<String>) {
     // load its vendor id and product name
     let (Ok(vendor), Ok(product)) = tokio::join!(
         tokio::fs::read_to_string(path.join("vendor")),
         tokio::fs::read_to_string(path.join("device")),
     ) else {
         tracing::warn!("Failed to get vendor info for this PCI device.");
-        return ("Unknown".into(), "Unknown".into());
+        return (None, None);
     };
 
     // trim the strings we got
@@ -91,18 +91,18 @@ async fn pci_vendor_id(path: &Path) -> (String, String) {
         u16::from_str_radix(&product.replace("0x", ""), 16),
     ) else {
         tracing::warn!("PCI vendor info was not parseable as a number.");
-        return (vendor, product);
+        return (Some(vendor), Some(product));
     };
 
     // use them
     if let Some(device) = pci_ids::Device::from_vid_pid(num_vendor, num_product) {
         return (
-            device.vendor().name().to_string(),
-            device.name().to_string(),
+            Some(device.vendor().name().to_string()),
+            Some(device.name().to_string()),
         );
     }
 
     // the listing didn't have these devices present!
     // we'll just return the raw numeric values instead.
-    (vendor, product)
+    (Some(vendor), Some(product))
 }

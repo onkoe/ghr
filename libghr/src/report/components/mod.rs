@@ -32,16 +32,16 @@ pub struct ComponentInfo {
     bus: ComponentBus,
 
     /// An identifier for the device.
-    id: String,
+    id: Option<String>,
 
-    /// Info about what kind of device this is. (TODO: make a type for this and parse on linux/android)
-    class: String,
+    /// Info about what kind of device this is.
+    class: Option<String>,
 
     /// The device's vendor identifier.
-    vendor_id: String,
+    vendor_id: Option<String>,
 
     /// Status info about the component.
-    status: ComponentStatus,
+    status: Option<ComponentStatus>,
 
     /// General information about the component.
     desc: ComponentDescription,
@@ -75,6 +75,7 @@ pub struct ComponentStatus {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
 pub enum ComponentDescription {
+    /// About the central processing unit (CPU).
     CpuDescription {
         /// The CPU's clock speed in GHz. (ex: 3.4 GHz)
         clock_speed: f64,

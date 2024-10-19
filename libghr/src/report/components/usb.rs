@@ -25,7 +25,7 @@ pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
             id,
             class,
             vendor_id,
-            status: ComponentStatus {}, // TODO
+            status: None, // TODOComponentStatus {}
             desc: ComponentDescription::None,
         })
     }
@@ -36,7 +36,7 @@ pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
 /// on Linux, this grabs the class codes for our devices.
 #[cfg(target_os = "linux")]
 #[tracing::instrument]
-async fn usb_class(path: &Path) -> String {
+async fn usb_class(path: &Path) -> Option<String> {
     // read the files
     let Ok((class, subclass)) = try_join!(
         tokio::fs::read_to_string(path.join("bDeviceClass")),
@@ -45,7 +45,7 @@ async fn usb_class(path: &Path) -> String {
         tracing::warn!(
             "Failed to find device class/subclass! Yielding 'Unknown' for these values."
         );
-        return "Unknown".into();
+        return None;
     };
 
     let (class, subclass) = (class.trim(), subclass.trim());
@@ -57,17 +57,17 @@ async fn usb_class(path: &Path) -> String {
         u8::from_str_radix(subclass, 16),
     ) {
         if let Some(c) = usb_ids::SubClass::from_cid_scid(parsed_class, parsed_subclass) {
-            return format!("{} ({})", c.class().name(), c.name());
+            return Some(format!("{} ({})", c.class().name(), c.name()));
         }
     }
 
     // return the raw ID if we must
-    return format!("{} ({})", class, subclass);
+    return Some(format!("{} ({})", class, subclass));
 }
 
 #[cfg(target_os = "linux")]
 #[tracing::instrument]
-async fn usb_vendor_and_id(path: &Path) -> (String, String) {
+async fn usb_vendor_and_id(path: &Path) -> (Option<String>, Option<String>) {
     // look for human-readable string repr
 
     use usb_ids::FromId as _;
@@ -81,7 +81,7 @@ async fn usb_vendor_and_id(path: &Path) -> (String, String) {
         tracing::debug!(
             "oh cool, we got human readable strings! vendor: `{vendor}`. product: {product}."
         );
-        return (vendor, product);
+        return (Some(vendor), Some(product));
     }
 
     // otherwise, grab lame number
@@ -110,7 +110,7 @@ async fn usb_vendor_and_id(path: &Path) -> (String, String) {
             tracing::debug!("parsed from str radix");
             if let Some(dev) = usb_ids::Device::from_vid_pid(parsed_vend, parsed_prod) {
                 tracing::debug!("names");
-                return (dev.vendor().name().into(), dev.name().into());
+                return (Some(dev.vendor().name().into()), Some(dev.name().into()));
             }
 
             // sometimes, the linux usb list is incomplete. let's try just the vendor!
@@ -131,10 +131,7 @@ async fn usb_vendor_and_id(path: &Path) -> (String, String) {
     }
 
     // give up
-    (
-        vend.unwrap_or("Unknown".into()),
-        prod.unwrap_or("Unknown".into()),
-    )
+    (None, None)
 }
 
 #[cfg(target_os = "windows")]
@@ -271,10 +268,11 @@ pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
 
             Ok(ComponentInfo {
                 bus: ComponentBus::Usb,
-                id: id.to_string_lossy().to_string(),
-                class: class.to_string_lossy().to_string(),
-                vendor_id: vendor_id.to_string_lossy().to_string(),
-                status: ComponentStatus {}, // TODO
+                id: Some(id.to_string_lossy().to_string()),
+                class: Some(class.to_string_lossy().to_string()),
+                vendor_id: Some(vendor_id.to_string_lossy().to_string()),
+                status: None, // TODO
+                desc: ComponentDescription::None,
             })
         })
         .collect::<GhrResult<Vec<_>>>();
