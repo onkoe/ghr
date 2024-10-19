@@ -4,6 +4,7 @@ use crate::prelude::internal::*;
 
 pub mod cpu;
 pub mod pci;
+pub mod ram;
 pub mod usb;
 
 /// Grabs any known components (devices) on the system.
@@ -15,13 +16,17 @@ pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
         RefreshKind::new().with_cpu(CpuRefreshKind::everything()),
     );
 
-    let (cpu, usb, pci) = tokio::try_join! {
+    let (cpu, usb, pci, ram) = tokio::try_join! {
         cpu::cpu(&system),
         usb::usb_components(),
         pci::pci_components(),
+        ram::ram(),
     }?;
 
-    Ok([vec![cpu], usb, pci].into_iter().flatten().collect())
+    Ok([vec![cpu], usb, pci, vec![ram]]
+        .into_iter()
+        .flatten()
+        .collect())
 }
 
 /// A representation of any single component in the machine.
@@ -82,6 +87,17 @@ pub enum ComponentDescription {
 
         /// The CPU's core count.
         core_ct: u32,
+    },
+
+    /// For the system memory.
+    ///
+    /// Some info is unavailable since some machines lack the ability to share
+    /// per-stick info.
+    ///
+    /// Also, all values are in bytes.
+    RamDescription {
+        /// The total amount of physical memory.
+        total_phsyical_memory: u64,
     },
 
     /// No description is available for this device.
