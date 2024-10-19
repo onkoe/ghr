@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT recv_time, report as \"report: Json<Report>\" FROM reports",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "recv_time",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 1,
+        "name": "report: Json<Report>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "3c35d1f6cbf47fdf4cac2654501e5e6488f52b859442c8fa807d8d030c03840b"
+}
