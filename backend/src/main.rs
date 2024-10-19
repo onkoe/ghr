@@ -14,6 +14,12 @@
 //! To make the user, you use `sudo -u postgres psql`, then
 //! `CREATE USER (yourname) WITH PASSWORD '(YOURPASS)';`. I personally use
 //! `farts` as my password - hope that helps.
+//!
+//! ## Usage
+//!
+//! First, make sure Postgres is up and running: `sudo systemctl start
+//! postgres`. You can now run this backend from a binary or using
+//! `cargo run -- (your args)`. Enjoy!
 
 use std::time::Instant;
 
@@ -21,8 +27,6 @@ use actix_web::{get, post, web::Json, App, HttpResponse, HttpServer, Responder};
 use args::Arguments;
 use clap::Parser as _;
 use libghr::report::Report;
-
-use crate::config::Config;
 
 mod args;
 mod config;
@@ -59,7 +63,7 @@ async fn main() -> std::io::Result<()> {
 
     // make connection to the database
     tracing::info!("Connecting to database...");
-    let (client, connection) = db::connect().await.map_err(std::io::Error::other)?;
+    let (_client, _connection) = db::connect().await.map_err(std::io::Error::other)?;
 
     tracing::info!("Connected! The server is now running...");
     HttpServer::new(|| {

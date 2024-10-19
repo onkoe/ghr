@@ -6,6 +6,7 @@ use crate::args::Arguments;
 const BACKEND_IDENTIFIER: &str = "ghr_backend";
 
 /// Where to store the configuration.
+#[allow(unused)]
 static CONF_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     dirs::config_dir()
         .expect("Failed to find data directory for server to use.")

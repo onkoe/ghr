@@ -1,0 +1,11 @@
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    .actions {
+        display: flexbox;
+        align-self: center;
+    }
+}
