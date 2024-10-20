@@ -5,7 +5,7 @@ async fn main() {
     // add logging
     tracing_subscriber::fmt()
         .pretty()
-        .with_max_level(tracing::Level::ERROR)
+        .with_max_level(tracing::Level::WARN)
         .init();
 
     println!("welcome to the onkoe botnet, {}!", whoami::realname());

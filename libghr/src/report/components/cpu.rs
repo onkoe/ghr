@@ -61,52 +61,77 @@ pub async fn cpu(system: &sysinfo::System) -> GhrResult<Vec<ComponentInfo>> {
 }
 
 #[cfg(target_os = "windows")]
+#[tracing::instrument]
 pub async fn cpu(_system: &sysinfo::System) -> GhrResult<Vec<ComponentInfo>> {
     use crate::report::components::windows::get_wmi;
-    use std::ffi::CString;
+    use std::collections::HashMap;
+    use wmi::Variant;
 
     // connect to the windows stuff
-    let wmi_connection = get_wmi()?;
-
-    // make a container for the cpu info
-    #[allow(non_snake_case)]
-    #[derive(serde::Deserialize)]
-    struct CpuInfo {
-        Manufacturer: CString,
-        MaxClockSpeed: u32,
-        Name: CString,
-        NumberOfCores: u32,
-        //
-        // cache stuff
-        //
-        // L2CacheSize: u32,
-        // L2CacheSpeed: u32,
-        // L3CacheSize: u32,
-        // L3CacheSpeed: u32,
-    }
+    let wmi = get_wmi()?;
 
     // grab info about cpu
-    let res: Result<Vec<CpuInfo>, wmi::WMIError> = wmi_connection.async_query().await;
+    tracing::debug!("looking for CPUs...");
+    let query: Result<Vec<HashMap<String, Variant>>, _> =
+        wmi.async_raw_query("SELECT * from Win32_Processor").await;
 
-    let info = match res {
+    // unwrap it
+    let query = match query {
         Ok(cpu_info) => cpu_info,
         Err(e) => {
-            tracing::error!("Failed to get information for this CPU.");
+            tracing::error!("Couldn't get CPU information.");
             return Err(GhrError::ComponentInfoInaccessible(e.to_string()));
         }
     };
 
-    Ok(info
-        .into_iter()
-        .map(|cpu| ComponentInfo {
+    // make it into real info
+    let mut cpus = Vec::new();
+    for cpu in query {
+        let name = cpu.get("Name").and_then(|s| {
+            if let Variant::String(name) = s {
+                Some(name.trim().to_string())
+            } else {
+                None
+            }
+        });
+
+        let manufacturer = cpu
+            .get("Manufacturer")
+            .and_then(|s| {
+                if let Variant::String(vendor) = s {
+                    Some(vendor)
+                } else {
+                    None
+                }
+            })
+            .cloned();
+
+        // note: we / this by 1000 to get the ghz
+        let speed = cpu.get("MaxClockSpeed").and_then(|s| {
+            if let Variant::UI4(clk) = *s {
+                Some(f64::from(clk) / 1000_f64)
+            } else {
+                None
+            }
+        });
+
+        let number_of_cores = cpu.get("NumberOfCores").and_then(|s| {
+            if let Variant::UI4(clk) = *s {
+                Some(clk)
+            } else {
+                None
+            }
+        });
+
+        cpus.push(ComponentInfo {
             bus: ComponentBus::Sys,
-            id: cpu.Name.to_str().ok().map(|s| s.to_string()),
+            id: name,
             class: None,
-            vendor_id: cpu.Manufacturer.to_str().ok().map(|s| s.to_string()),
+            vendor_id: manufacturer,
             status: None,
             desc: ComponentDescription::CpuDescription {
-                clock_speed: Some(f64::from(cpu.MaxClockSpeed) / 1000_f64),
-                core_ct: Some(cpu.NumberOfCores),
+                clock_speed: speed,
+                core_ct: number_of_cores,
 
                 // TODO: we have this info but i'm too lazy to parse it rn
                 // see: https://dmtf.org/sites/default/files/standards/documents/DSP0134_3.2.0.pdf,
@@ -114,5 +139,9 @@ pub async fn cpu(_system: &sysinfo::System) -> GhrResult<Vec<ComponentInfo>> {
                 cache: None,
             },
         })
-        .collect::<Vec<_>>())
+    }
+
+    tracing::debug!("found {} CPUs!", cpus.len());
+
+    Ok(cpus)
 }
