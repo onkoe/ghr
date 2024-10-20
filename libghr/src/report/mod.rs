@@ -26,7 +26,7 @@ impl Report {
     pub async fn new() -> Result<Self, GhrError> {
         Ok(Self {
             os: Self::os_info()?,
-            machine: MachineInfo::new(MachineIdentifier::new_true()?), // TODO: allow MachId::Random
+            machine: MachineInfo::new(MachineIdentifier::new_random()), // TODO: use the real one
 
             components: components::get_components().await?,
 
