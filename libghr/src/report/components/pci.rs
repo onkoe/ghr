@@ -1,8 +1,10 @@
 //! pci
 
 use crate::prelude::internal::*;
-use std::path::Path;
 
+#[cfg(target_os = "linux")]
+use std::path::Path;
+#[cfg(target_os = "linux")]
 use tokio::join;
 
 #[cfg(target_os = "linux")]
@@ -106,3 +108,102 @@ async fn pci_vendor_id(path: &Path) -> (Option<String>, Option<String>) {
     // we'll just return the raw numeric values instead.
     (Some(vendor), Some(product))
 }
+
+#[cfg(target_os = "windows")]
+#[tracing::instrument]
+pub async fn pci_components() -> GhrResult<Vec<ComponentInfo>> {
+    use super::windows::get_pnp_with_did_prefix;
+    use crate::report::components::windows::get_wmi;
+
+    let wmi = get_wmi()?;
+    get_pnp_with_did_prefix(wmi, "PCI").await
+}
+
+/*
+#[cfg(target_os = "windows")]
+#[tracing::instrument]
+pub async fn pci_components() -> GhrResult<Vec<ComponentInfo>> {
+    use std::collections::HashMap;
+    use windows::Win32::System::Wmi::CIMTYPE_ENUMERATION;
+    use wmi::{FilterValue, Variant};
+
+    use crate::report::components::windows::{get_pnp, get_wmi};
+    let wmi_connection = get_wmi()?;
+
+    // grab list of all pnp devices on windows
+    let pnp = get_pnp(wmi_connection).await?;
+    dbg!(pnp.len());
+
+    // filter devices for the pci ones
+    tracing::debug!("filtering pci devices...");
+    Ok(pnp
+        .into_iter()
+        .map(|pnp_device| {
+            (
+                pnp_device
+                    .get("DeviceID")
+                    .and_then(|n| {
+                        if let Variant::String(s) = n {
+                            Some(s)
+                        } else {
+                            None
+                        }
+                    })
+                    .cloned(),
+                pnp_device,
+            )
+        })
+        .filter(|(device_id, _pnp_device)| {
+            device_id
+                .clone()
+                .filter(|did| did.trim().to_uppercase().starts_with("PCI"))
+                .is_some()
+        })
+        .map(|(_, pnp_device)| pnp_device)
+        .map(|pci_device| {
+            // asdf
+            let id = pci_device
+                .get("Name")
+                .and_then(|n| {
+                    if let Variant::String(s) = n {
+                        Some(s)
+                    } else {
+                        None
+                    }
+                })
+                .cloned();
+
+            let class = pci_device
+                .get("PNPClass")
+                .and_then(|n| {
+                    if let Variant::String(s) = n {
+                        Some(s)
+                    } else {
+                        None
+                    }
+                })
+                .cloned();
+
+            let vendor_id = pci_device
+                .get("Manufacturer")
+                .and_then(|n| {
+                    if let Variant::String(s) = n {
+                        Some(s)
+                    } else {
+                        None
+                    }
+                })
+                .cloned();
+
+            ComponentInfo {
+                bus: ComponentBus::Pci,
+                id,
+                class,
+                vendor_id,
+                status: None,
+                desc: ComponentDescription::None,
+            }
+        })
+        .collect::<Vec<ComponentInfo>>())
+}
+*/
