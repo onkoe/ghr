@@ -21,7 +21,7 @@ async fn main() {
     // add logging
     tracing_subscriber::fmt()
         .pretty()
-        .with_max_level(tracing::Level::WARN)
+        .with_max_level(tracing::Level::DEBUG)
         .init();
 
     // check args

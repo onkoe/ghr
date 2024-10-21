@@ -3,6 +3,7 @@ pub(crate) mod internal {
     pub use crate::{
         error::{GhrError, GhrResult},
         report::{
+            components::cpu::{Cache, Frequency},
             components::{
                 ComponentBus, ComponentDescription, ComponentInfo, ComponentStatus, Removability,
             },

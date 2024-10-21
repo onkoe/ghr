@@ -1,4 +1,4 @@
-use cpu::CpuCache;
+use cpu::{Cache, Core, Frequency};
 use sysinfo::{CpuRefreshKind, RefreshKind};
 
 use crate::prelude::internal::*;
@@ -13,12 +13,8 @@ pub mod usb;
 /// Currently, this just supports USB and PCI. Additional device types will
 /// come soon!
 pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
-    let system = sysinfo::System::new_with_specifics(
-        RefreshKind::new().with_cpu(CpuRefreshKind::everything()),
-    );
-
     let (cpu, usb, pci, ram) = tokio::try_join! {
-        cpu::cpu(&system),
+        cpu::cpu(),
         usb::usb_components(),
         pci::pci_components(),
         ram::ram(),
@@ -80,14 +76,17 @@ pub struct ComponentStatus {}
 pub enum ComponentDescription {
     /// About the central processing unit (CPU).
     CpuDescription {
-        /// The CPU's clock speed in GHz. (ex: 3.4 GHz)
-        clock_speed: Option<f64>,
+        /// The CPU's clock speed in MHz. (ex: 3400 MHz)
+        clock_speed: Frequency,
 
         /// The CPU's core count.
         core_ct: Option<u32>,
 
         /// Information about the CPU's cache.
-        cache: Option<Vec<CpuCache>>,
+        cache: Option<Vec<Cache>>,
+
+        /// Information about each CPU core.
+        cores: Option<Vec<Core>>,
     },
 
     /// For the system memory.
