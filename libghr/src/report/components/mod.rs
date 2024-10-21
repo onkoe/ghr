@@ -1,5 +1,4 @@
 use cpu::{Cache, Core, Frequency};
-use sysinfo::{CpuRefreshKind, RefreshKind};
 
 use crate::prelude::internal::*;
 

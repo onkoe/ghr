@@ -7,9 +7,8 @@ rust-version = "1.81"
 [dependencies]
 argon2 = "0.5.3"
 base64 = "0.22.1"
-futures = { version = "0.3.31", default-features = false, features = ["alloc", "async-await", "std"] }
 mac_address = { version = "1.1.7", features = ["serde"] }
-pisserror = "0.2.3"
+pisserror = "0.3.0-rc.1"
 rand = "0.8.5"
 serde = { version = "1.0.210", default-features = false, features = [
     "alloc",
@@ -18,7 +17,6 @@ serde = { version = "1.0.210", default-features = false, features = [
     "serde_derive",
     "std",
 ] }
-sysinfo = "0.32.0"
 tokio = { version = "1.40.0", features = ["fs", "macros"] }
 tokio-stream = { version = "0.1.16", features = ["fs"] }
 tracing = { version = "0.1.40", features = ["async-await"] }
@@ -29,15 +27,7 @@ usb-ids = "1.2024.4"
 pci-ids = "0.2.5"
 procfs = "0.17.0"
 
-
 [target.'cfg(target_os = "windows")'.dependencies]
-windows-core = "=0.58"
-windows = { version = "0.58", features = [
-    "Win32_Devices",
-    "Win32_Devices_DeviceAndDriverInstallation",
-    "Win32_System",
-    "Win32_System_Registry",
-] }
 wmi = "0.14.0"
 
 windows-version = "0.1.1"
