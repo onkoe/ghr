@@ -118,7 +118,7 @@ mod linux {
 }
 
 #[cfg(target_os = "windows")]
-mod windows {
+pub(crate) mod windows {
     use std::collections::HashMap;
 
     use crate::{
@@ -143,7 +143,7 @@ mod windows {
         }};
     }
 
-    pub(super) fn get_wmi() -> GhrResult<WMIConnection> {
+    pub(crate) fn get_wmi() -> GhrResult<WMIConnection> {
         // connect to the windows stuff
         let com_library = COM_LIBRARY.with(|com| com.clone())?;
         let wmi_connection = match WMIConnection::new(com_library) {
@@ -262,5 +262,89 @@ mod windows {
                 }
             })
             .collect::<Vec<ComponentInfo>>())
+    }
+
+    /// A simple trait that makes it easier to get/map values from a
+    /// `wmi::Variant`.
+    pub(crate) trait VariantInto {
+        /// tries to get a string from this variant
+        fn string_from_variant(&self) -> Option<String>;
+
+        /// tries to get a u32 from this variant
+        fn u32_from_variant(&self) -> Option<u32>;
+
+        /// tries to get a u64 from this variant
+        fn u64_from_variant(&self) -> Option<u64>;
+
+        /// tries to get a bool from this variant
+        fn bool_from_variant(&self) -> Option<bool>;
+    }
+
+    impl VariantInto for Variant {
+        fn string_from_variant(&self) -> Option<String> {
+            if let Variant::String(s) = self {
+                Some(s.clone())
+            } else {
+                None
+            }
+        }
+
+        fn u32_from_variant(&self) -> Option<u32> {
+            if let Variant::UI4(u) = *self {
+                Some(u)
+            } else {
+                None
+            }
+        }
+
+        fn u64_from_variant(&self) -> Option<u64> {
+            if let Variant::UI8(u) = *self {
+                Some(u)
+            } else {
+                None
+            }
+        }
+
+        fn bool_from_variant(&self) -> Option<bool> {
+            if let Variant::Bool(b) = *self {
+                Some(b)
+            } else {
+                None
+            }
+        }
+    }
+
+    impl VariantInto for Option<&Variant> {
+        fn string_from_variant(&self) -> Option<String> {
+            if let Some(Variant::String(s)) = self {
+                return Some(s.clone());
+            }
+
+            None
+        }
+
+        fn u32_from_variant(&self) -> Option<u32> {
+            if let Some(Variant::UI4(u)) = self {
+                return Some(*u);
+            }
+
+            None
+        }
+
+        fn u64_from_variant(&self) -> Option<u64> {
+            if let Some(Variant::UI8(u)) = self {
+                return Some(*u);
+            }
+
+            None
+        }
+
+        fn bool_from_variant(&self) -> Option<bool> {
+            if let Some(Variant::Bool(b)) = self {
+                return Some(*b);
+            }
+
+            None
+        }
     }
 }
