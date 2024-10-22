@@ -40,7 +40,12 @@ impl Report {
             ),
         ]);
 
-        Ok(OperatingSystemInfo::new(name, release, arch, other_info))
+        Ok(OperatingSystemInfo {
+            name,
+            version: release,
+            architecture: arch,
+            other: other_info,
+        })
     }
 
     /// Grabs operating system info for the hardware report.
@@ -87,21 +92,6 @@ pub struct OperatingSystemInfo {
 }
 
 impl OperatingSystemInfo {
-    pub(crate) fn new(
-        name: String,
-        version: String,
-        arch: String,
-        other: BTreeMap<String, String>,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            architecture: arch,
-
-            other,
-        }
-    }
-
     /// Grabs the name of this operating system.
     pub fn name(&self) -> String {
         self.name.clone()
