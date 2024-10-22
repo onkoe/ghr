@@ -50,102 +50,56 @@ pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
 
 #[cfg(target_os = "windows")]
 pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
+    use std::collections::HashMap;
+    use wmi::Variant;
+
     // access windows' wmi
-    use super::windows::get_wmi;
     let wmi_connection = get_wmi()?;
 
-    // make a struct describing phsyical memory (see `Win32_PhysicalMemory`)
-    #[derive(serde::Deserialize, Debug)]
-    #[allow(non_camel_case_types, non_snake_case, unused)]
-    struct Win32_PhysicalMemory {
-        pub Capacity: Option<u64>,
-        pub ConfiguredClockSpeed: Option<u32>,
-        pub ConfiguredVoltage: Option<u32>,
-        pub Manufacturer: Option<String>,
-        pub Name: Option<String>,
-        pub Removable: Option<bool>,
-
-        // we don't use these, but the serialization fails without them for
-        // some reason...
-        pub Attributes: Option<u32>,
-        pub BankLabel: Option<String>,
-        pub Caption: Option<String>,
-        pub CreationClassName: Option<String>,
-        pub DataWidth: Option<u16>,
-        pub Description: Option<String>,
-        pub DeviceLocator: Option<String>,
-        pub FormFactor: Option<u16>,
-        pub HotSwappable: Option<bool>,
-        pub InstallDate: Option<String>,
-        pub InterleaveDataDepth: Option<u16>,
-        pub InterleavePosition: Option<u32>,
-        pub MaxVoltage: Option<u32>,
-        pub MemoryType: Option<u16>,
-        pub MinVoltage: Option<u32>,
-        pub Model: Option<String>,
-        pub OtherIdentifyingInfo: Option<String>,
-        pub PartNumber: Option<String>,
-        pub PositionInRow: Option<u32>,
-        pub PoweredOn: Option<bool>,
-        pub Replaceable: Option<bool>,
-        pub SerialNumber: Option<String>,
-        pub SKU: Option<String>,
-        pub SMBIOSMemoryType: Option<u32>,
-        pub Speed: Option<u32>,
-        pub Status: Option<String>,
-        pub Tag: Option<String>,
-        pub TotalWidth: Option<u16>,
-        pub TypeDetail: Option<u16>,
-        pub Version: Option<String>,
-    }
-
-    // look for memory modules
-    let query: Result<Vec<Win32_PhysicalMemory>, wmi::WMIError> =
-        wmi_connection.async_query().await;
-
-    // make sure the query was successful
-    let memory = match query {
-        Ok(memory) => memory,
-        Err(e) => {
+    // query `wmi` for memory modules
+    let query: Vec<HashMap<String, Variant>> = wmi_connection
+        .async_raw_query("SELECT * FROM Win32_PhysicalMemory")
+        .await
+        .map_err(|e| {
             tracing::error!("Failed to query Windows for memory modules.");
-            return Err(GhrError::ComponentInfoInaccessible(e.to_string()));
+            GhrError::ComponentInfoInaccessible(e.to_string())
+        })?;
+
+    // map them into components
+    let all_ram = query.into_iter().map(|ram| {
+        // grab module info
+        let configured_clock_speed = ram.get("ConfiguredClockSpeed").u32_from_variant();
+        let configured_voltage = ram.get("ConfiguredVoltage").u32_from_variant();
+        let removable = match ram.get("Removable").bool_from_variant() {
+            Some(true) => Some(Removability::Removable),
+            Some(false) => Some(Removability::NonRemovable),
+            None => None,
+        };
+        let total_phsyical_memory = ram.get("Capacity").u64_from_variant();
+
+        // name + vendor
+        let id = ram.get("Name").string_from_variant();
+        let vendor_id = ram.get("Manufacturer").string_from_variant();
+
+        // create a ram struct
+        let memory_info = RamDescription {
+            total_phsyical_memory,
+            configured_clock_speed,
+            configured_voltage,
+            removable,
+        };
+
+        // make the component
+        ComponentInfo {
+            bus: ComponentBus::Sys,
+            id,
+            class: None,
+            vendor_id,
+            status: None,
+            desc: ComponentDescription::RamDescription(memory_info),
         }
-    };
+    });
 
-    Ok(memory
-        .into_iter()
-        .map(|mem| {
-            let configured_clock_speed = match mem.ConfiguredClockSpeed {
-                Some(0) => None,
-                other => Some(other),
-            }
-            .flatten();
-
-            let configured_voltage = match mem.ConfiguredVoltage {
-                Some(0) => None,
-                other => Some(other),
-            }
-            .flatten();
-
-            let removable = match mem.Removable {
-                Some(true) => Some(Removability::Removable),
-                Some(false) => Some(Removability::NonRemovable),
-                None => None,
-            };
-
-            ComponentInfo {
-                bus: ComponentBus::Sys,
-                id: mem.Name,
-                class: None,
-                vendor_id: mem.Manufacturer,
-                status: None,
-                desc: ComponentDescription::RamDescription(RamDescription {
-                    total_phsyical_memory: mem.Capacity,
-                    configured_clock_speed,
-                    configured_voltage,
-                    removable,
-                }),
-            }
-        })
-        .collect::<Vec<ComponentInfo>>())
+    // return the list
+    Ok(all_ram.collect())
 }

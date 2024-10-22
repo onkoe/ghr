@@ -145,8 +145,3 @@ pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
     let wmi = get_wmi()?;
     get_pnp_with_did_prefix(wmi, "USB").await
 }
-
-#[cfg(target_os = "windows")]
-pub async fn usb_components2() -> GhrResult<Vec<ComponentInfo>> {
-    todo!()
-}
