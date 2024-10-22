@@ -24,4 +24,14 @@ pub(crate) mod internal {
     pub use ts_rs::TS as TypeScript;
 }
 
-pub use crate::report::Report;
+/// this module's re-exports are, themselves, re-exported by the root of this
+/// library crate!
+///
+/// that makes them available from the crate's root, so instead of importing
+///  `libghr::prelude::Thing`, you just grab `libghr::Thing`.
+pub(super) mod public {
+    pub use crate::{
+        error::{GhrError, GhrResult},
+        report::Report,
+    };
+}
