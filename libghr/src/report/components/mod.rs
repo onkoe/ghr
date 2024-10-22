@@ -1,6 +1,7 @@
 use crate::prelude::internal::*;
 
 pub mod cpu;
+pub mod gpu;
 pub mod pci;
 pub mod ram;
 pub mod usb;
@@ -81,6 +82,9 @@ pub enum ComponentDescription {
     ///
     /// Also, all values are in bytes.
     RamDescription(RamDescription),
+
+    /// About the graphics card (GPU).
+    GpuDescription(GpuDescription),
 
     /// No description is available for this device.
     None,
