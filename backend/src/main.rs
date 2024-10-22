@@ -26,7 +26,8 @@ use crate::{args::Arguments, state::State};
 use actix_web::{web::Data, App, HttpResponse, HttpServer, Responder};
 use clap::Parser as _;
 use libghr::report::Report;
-use sqlx::types::{time::OffsetDateTime, Json};
+use shared::{WrappedReport, WrappedReportTs};
+use sqlx::types::Json;
 
 use state::AppState;
 
@@ -34,12 +35,6 @@ mod args;
 mod config;
 mod db;
 mod state;
-
-#[derive(sqlx::FromRow)]
-struct ReportRow {
-    recv_time: OffsetDateTime,
-    report: Json<Report>,
-}
 
 #[actix_web::get("/")]
 async fn index() -> impl Responder {
@@ -50,7 +45,7 @@ async fn index() -> impl Responder {
 #[tracing::instrument(skip_all)]
 async fn add_report(state: AppState, report: String) -> impl Responder {
     // grab the current time
-    let time = OffsetDateTime::now_utc();
+    let time = chrono::Utc::now();
 
     // try making an object from the report
     let parsed_report: Report = match serde_json::from_str(&report) {
@@ -81,20 +76,20 @@ async fn add_report(state: AppState, report: String) -> impl Responder {
             .finish();
     }
 
-    HttpResponse::Ok().json("TODO")
+    HttpResponse::Ok().finish()
 }
 
 #[actix_web::get("/reports")]
 async fn reports(state: AppState) -> impl Responder {
     let query = sqlx::query_as!(
-        ReportRow,
-        r#"SELECT recv_time, report as "report: Json<Report>" FROM reports"#
+        WrappedReport,
+        r#"SELECT id, recv_time, report as "report: Json<Report>" FROM reports"#
     )
     .fetch_all(&state.pool)
     .await;
 
     let rows = match query {
-        Ok(rows) => rows,
+        Ok(rows) => rows.into_iter().map(WrappedReportTs::from),
         Err(e) => {
             tracing::warn!("Unable to query the database for reports! (err: {e})");
             return HttpResponse::InternalServerError()
@@ -103,7 +98,7 @@ async fn reports(state: AppState) -> impl Responder {
         }
     };
 
-    let rows = rows.into_iter().map(|row| row.report).collect::<Vec<_>>();
+    let rows = rows.collect::<Vec<_>>();
     HttpResponse::Ok().json(rows)
 }
 
