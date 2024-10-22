@@ -7,7 +7,7 @@ use machine::MachineIdentifier;
 
 use crate::prelude::internal::*;
 
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub struct Report {
     os: OperatingSystemInfo,

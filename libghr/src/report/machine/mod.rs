@@ -10,7 +10,7 @@ pub use hash::Hash;
 
 pub type MachineInfoReturnType = GhrResult<MachineInfo>;
 
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub struct MachineInfo {
     /// The organization that created the machine.
@@ -40,7 +40,7 @@ impl MachineInfo {
 }
 
 /// A unique identifier for each computer.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 pub enum MachineIdentifier {
     /// This is a 'true' identifier - it uniquely identifies the machine based
     /// on its hardware.
