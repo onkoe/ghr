@@ -1333,6 +1333,7 @@ dependencies = [
  "pisserror",
  "procfs",
  "rand",
+ "regex",
  "reqwest",
  "rpassword",
  "serde",

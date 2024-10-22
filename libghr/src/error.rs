@@ -19,6 +19,8 @@ pub enum GhrError {
     ComponentInfoInaccessible(String),
     #[error("Component info contained unexpected information. (err: {_0})")]
     ComponentInfoWeirdInfo(String),
+    #[error("Failed to create regular rexpression. (err: {_0}")]
+    RegexCreationFailure(String),
 
     // errors related to generally-unexpected failures
     #[error("Couldn't create a salt for the system identification hash. {ASK_USER_TO_REPORT} (err: {_0})")]
