@@ -22,5 +22,9 @@ pub struct GpuDescription {
 
 /// Gets information about the system's GPU(s).
 pub async fn gpu() -> GhrResult<Vec<ComponentInfo>> {
-    todo!()
+    #[cfg(target_os = "linux")]
+    return linux::gpus().await;
+
+    #[cfg(target_os = "windows")]
+    return windows::gpus().await;
 }

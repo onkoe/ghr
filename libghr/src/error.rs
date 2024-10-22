@@ -19,6 +19,8 @@ pub enum GhrError {
     ComponentInfoInaccessible(String),
     #[error("Component info contained unexpected information. (err: {_0})")]
     ComponentInfoWeirdInfo(String),
+    #[error("Specific component unsupported under the provided configuration. (err: {_0})")]
+    ComponentUnsupported(String),
     #[error("Failed to create regular rexpression. (err: {_0}")]
     RegexCreationFailure(String),
 

@@ -11,14 +11,15 @@ pub mod usb;
 /// Currently, this just supports USB and PCI. Additional device types will
 /// come soon!
 pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
-    let (cpu, usb, pci, ram) = tokio::try_join! {
+    let (cpu, usb, pci, ram, gpus) = tokio::try_join! {
         cpu::cpu(),
         usb::usb_components(),
         pci::pci_components(),
         ram::ram(),
+        gpu::gpu(),
     }?;
 
-    Ok([cpu, usb, pci, ram].into_iter().flatten().collect())
+    Ok([cpu, usb, pci, ram, gpus].into_iter().flatten().collect())
 }
 
 /// A representation of any single component in the machine.
