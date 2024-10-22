@@ -2,6 +2,28 @@
 
 use crate::prelude::internal::*;
 
+/// For the system memory.
+///
+/// Some info is unavailable since some machines lack the ability to share
+/// per-stick info.
+///
+/// Also, all values are in bytes.
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
+#[non_exhaustive]
+pub struct RamDescription {
+    /// The total amount of physical memory.
+    pub total_phsyical_memory: Option<u64>,
+
+    /// The configured clock speed of this module, in MHz.
+    pub configured_clock_speed: Option<u32>,
+
+    /// The configured voltage of this module, in mW.
+    pub configured_voltage: Option<u32>,
+
+    /// Whether or not the module is removable.
+    pub removable: Option<Removability>,
+}
+
 #[cfg(target_os = "linux")]
 pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
     use procfs::{Current, FromRead, Meminfo};
@@ -17,12 +39,12 @@ pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
         class: None,
         vendor_id: None,
         status: None,
-        desc: ComponentDescription::RamDescription {
+        desc: ComponentDescription::RamDescription(RamDescription {
             total_phsyical_memory: Some(total_mem),
             configured_clock_speed: None,
             configured_voltage: None,
             removable: None,
-        },
+        }),
     }])
 }
 
@@ -117,12 +139,12 @@ pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
                 class: None,
                 vendor_id: mem.Manufacturer,
                 status: None,
-                desc: ComponentDescription::RamDescription {
+                desc: ComponentDescription::RamDescription(RamDescription {
                     total_phsyical_memory: mem.Capacity,
                     configured_clock_speed,
                     configured_voltage,
                     removable,
-                },
+                }),
             }
         })
         .collect::<Vec<ComponentInfo>>())

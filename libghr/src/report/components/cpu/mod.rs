@@ -7,6 +7,23 @@ mod linux;
 #[cfg(target_os = "windows")]
 mod windows;
 
+/// About the central processing unit (CPU).
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
+#[non_exhaustive]
+pub struct CpuDescription {
+    /// The CPU's clock speed in MHz. (ex: 3400 MHz)
+    pub clock_speed: Frequency,
+
+    /// The CPU's core count.
+    pub core_ct: Option<u32>,
+
+    /// Information about the CPU's cache.
+    pub cache: Option<Vec<Cache>>,
+
+    /// Information about each CPU core.
+    pub cores: Option<Vec<Core>>,
+}
+
 /// One of many physical processor cores.
 #[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 pub struct Core {
