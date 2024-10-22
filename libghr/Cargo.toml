@@ -20,6 +20,7 @@ serde = { version = "1.0.210", default-features = false, features = [
 tokio = { version = "1.40.0", features = ["fs", "macros"] }
 tokio-stream = { version = "0.1.16", features = ["fs"] }
 tracing = { version = "0.1.40", features = ["async-await"] }
+ts-rs = "10.0.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 nix = { version = "0.29.0", features = ["feature"] }

@@ -8,21 +8,21 @@ mod linux;
 mod windows;
 
 /// One of many physical processor cores.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 pub struct Core {
     pub cache: Option<Vec<Cache>>,
     pub speeds: Frequency,
 }
 
 /// Core frequencies in MHz.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 pub struct Frequency {
     pub min: Option<u32>,
     pub max: Option<u32>,
 }
 
 /// Info about the CPU's cache.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub enum Cache {
     L1 { size: u32, speed: Option<u32> },

@@ -23,7 +23,7 @@ pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
 }
 
 /// A representation of any single component in the machine.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub struct ComponentInfo {
     /// The type of bus this component is from.
@@ -46,7 +46,7 @@ pub struct ComponentInfo {
 }
 
 /// The bus a component is on.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub enum ComponentBus {
     Pci,
@@ -65,12 +65,12 @@ pub enum ComponentBus {
 }
 
 /// Information about the health of the component.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub struct ComponentStatus {}
 
 /// A general 'description' about the component
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub enum ComponentDescription {
     /// About the central processing unit (CPU).
@@ -113,7 +113,7 @@ pub enum ComponentDescription {
 }
 
 /// Whether or not a component is removable.
-#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 pub enum Removability {
     /// You can remove this component from your computer without damaging the
     /// hardware.

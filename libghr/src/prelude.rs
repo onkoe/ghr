@@ -13,6 +13,10 @@ pub(crate) mod internal {
             Report,
         },
     };
+
+    // macro that exports to typescript bindings.
+    // this prevents me from wasting 80 years doing hand-rolled serialization
+    pub use ts_rs::TS as TypeScript;
 }
 
 pub use crate::report::Report;
