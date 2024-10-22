@@ -15,6 +15,10 @@ pub(crate) mod internal {
         },
     };
 
+    // re-export the `wmi` helpers on windows
+    #[cfg(target_os = "windows")]
+    pub(crate) use crate::report::components::windows::{get_wmi, VariantInto};
+
     // macro that exports to typescript bindings.
     // this prevents me from wasting 80 years doing hand-rolled serialization
     pub use ts_rs::TS as TypeScript;
