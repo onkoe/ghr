@@ -1,3 +1,5 @@
 **/target
 libghr/Cargo.lock
 libghr/ghr.json
+/shared/bindings
+frontend/.vscode/settings.json
