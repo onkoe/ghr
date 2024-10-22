@@ -14,9 +14,15 @@ pub type MachineInfoReturnType = GhrResult<MachineInfo>;
 #[non_exhaustive]
 pub struct MachineInfo {
     /// The organization that created the machine.
-    vendor: String,
+    vendor: Option<String>,
     /// This machine's model number.
-    model: String,
+    model: Option<String>,
+
+    /// Info about the computer's BIOS.
+    bios: BiosInfo,
+
+    /// Info about the machine's chassis.
+    chassis: ChassisInfo,
 
     /// A hash that uniquely identifies this computer.
     ///
@@ -26,17 +32,106 @@ pub struct MachineInfo {
 }
 
 impl MachineInfo {
-    pub fn new(machine_id: MachineIdentifier) -> Self {
-        // TODO: fill these with stuff
-        let vendor = "".into();
-        let model = "".into();
+    #[cfg(target_os = "linux")]
+    pub async fn new(machine_id: MachineIdentifier) -> Self {
+        use std::path::PathBuf;
+
+        // the path to the machine info on linux
+        let sysfs_info = PathBuf::from("/sys/devices/virtual/dmi/id");
+
+        // read the vendor + model from `sysfs`
+        let vendor = sysfs_value(sysfs_info.join("sys_vendor")).await.ok();
+        let model = sysfs_value("product_name").await.ok();
+
+        // chassis info
+        let chassis = ChassisInfo {
+            kind: sysfs_value::<String>(sysfs_info.join("chassis_type"))
+                .await
+                .ok(),
+            vendor: sysfs_value::<String>(sysfs_info.join("chassis_vendor"))
+                .await
+                .ok(),
+            version: sysfs_value::<String>(sysfs_info.join("chassis_version"))
+                .await
+                .ok(),
+        };
+
+        // bios info
+        let bios = BiosInfo {
+            vendor: sysfs_value::<String>(sysfs_info.join("bios_vendor"))
+                .await
+                .ok(),
+            version: sysfs_value::<String>(sysfs_info.join("bios_version"))
+                .await
+                .ok(),
+            date: sysfs_value::<String>(sysfs_info.join("bios_date"))
+                .await
+                .ok()
+                .and_then(|date_str| chrono::NaiveDate::parse_from_str(&date_str, "%m/%d/%Y").ok()),
+        };
 
         Self {
             vendor,
             model,
+            bios,
+            chassis,
             hash: machine_id,
         }
     }
+
+    #[cfg(not(target_os = "linux"))]
+    pub async fn new(machine_id: MachineIdentifier) -> Self {
+        // system vendor + model
+        let vendor = None;
+        let model = None;
+
+        // chassis info
+        let chassis = ChassisInfo {
+            kind: None,
+            vendor: None,
+            version: None,
+        };
+
+        // bios info
+        let bios = BiosInfo {
+            vendor: None,
+            version: None,
+            date: None,
+        };
+
+        Self {
+            vendor,
+            model,
+            bios,
+            chassis,
+            hash: machine_id,
+        }
+    }
+}
+
+/// Information about the chassis.
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
+#[non_exhaustive]
+pub struct ChassisInfo {
+    /// The kind of chassis this machine is inside.
+    ///
+    /// Examples include "Desktop" or "Tablet".
+    pub kind: Option<String>,
+    /// The creator of the system chassis.
+    pub vendor: Option<String>,
+    pub version: Option<String>,
+}
+
+/// Information about the system BIOS.
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
+#[non_exhaustive]
+pub struct BiosInfo {
+    /// The creator of the system BIOS.
+    pub vendor: Option<String>,
+    /// The system BIOS version.
+    pub version: Option<String>,
+    /// The date the BIOS was compiled.
+    pub date: Option<chrono::NaiveDate>,
 }
 
 /// A unique identifier for each computer.
@@ -68,7 +163,7 @@ impl MachineIdentifier {
 
 impl Report {
     #[cfg(target_os = "linux")]
-    pub fn machine_info() -> MachineInfoReturnType {
-        Ok(MachineInfo::new(MachineIdentifier::new_true()?))
+    pub async fn machine_info() -> MachineInfoReturnType {
+        Ok(MachineInfo::new(MachineIdentifier::new_true()?).await)
     }
 }
