@@ -1,3 +1,6 @@
+#[cfg(target_os = "linux")]
+pub(crate) mod linux;
+
 pub(crate) fn unit_to_mibiunits(value: impl Into<u64>) -> u32 {
     const UNIT_CONV: u64 = 1_048_576;
 
