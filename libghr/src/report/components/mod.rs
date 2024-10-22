@@ -189,21 +189,7 @@ pub(crate) mod windows {
 
         Ok(query
             .into_iter()
-            .map(|pnp_device| {
-                (
-                    pnp_device
-                        .get("DeviceID")
-                        .and_then(|n| {
-                            if let Variant::String(s) = n {
-                                Some(s)
-                            } else {
-                                None
-                            }
-                        })
-                        .cloned(),
-                    pnp_device,
-                )
-            })
+            .map(|pnp_device| (pnp_device.get("DeviceID").string_from_variant(), pnp_device))
             .filter(|(device_id, _pnp_device)| {
                 device_id
                     .clone()
@@ -212,39 +198,10 @@ pub(crate) mod windows {
             })
             .map(|(_, pnp_device)| pnp_device)
             .map(|pci_device| {
-                // asdf
-                let id = pci_device
-                    .get("Name")
-                    .and_then(|n| {
-                        if let Variant::String(s) = n {
-                            Some(s)
-                        } else {
-                            None
-                        }
-                    })
-                    .cloned();
-
-                let class = pci_device
-                    .get("PNPClass")
-                    .and_then(|n| {
-                        if let Variant::String(s) = n {
-                            Some(s)
-                        } else {
-                            None
-                        }
-                    })
-                    .cloned();
-
-                let vendor_id = pci_device
-                    .get("Manufacturer")
-                    .and_then(|n| {
-                        if let Variant::String(s) = n {
-                            Some(s)
-                        } else {
-                            None
-                        }
-                    })
-                    .cloned();
+                // grab important details
+                let id = pci_device.get("Name").string_from_variant();
+                let class = pci_device.get("PNPClass").string_from_variant();
+                let vendor_id = pci_device.get("Manufacturer").string_from_variant();
 
                 let bus = match did_prefix {
                     "USB" => ComponentBus::Usb,

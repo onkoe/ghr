@@ -1,5 +1,3 @@
-#![cfg(target_os = "windows")]
-
 use crate::prelude::internal::*;
 
 #[tracing::instrument]
@@ -28,40 +26,14 @@ pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
     // make it into real info
     let mut cpus = Vec::new();
     for cpu in query {
-        let name = cpu.get("Name").and_then(|s| {
-            if let Variant::String(name) = s {
-                Some(name.trim().to_string())
-            } else {
-                None
-            }
-        });
+        let name = cpu
+            .get("Name")
+            .string_from_variant()
+            .map(|s| s.trim().to_string());
+        let manufacturer = cpu.get("Manufacturer").string_from_variant();
 
-        let manufacturer = cpu
-            .get("Manufacturer")
-            .and_then(|s| {
-                if let Variant::String(vendor) = s {
-                    Some(vendor)
-                } else {
-                    None
-                }
-            })
-            .cloned();
-
-        let speed = cpu.get("MaxClockSpeed").and_then(|s| {
-            if let Variant::UI4(clk) = *s {
-                Some(clk)
-            } else {
-                None
-            }
-        });
-
-        let number_of_cores = cpu.get("NumberOfCores").and_then(|s| {
-            if let Variant::UI4(clk) = *s {
-                Some(clk)
-            } else {
-                None
-            }
-        });
+        let speed = cpu.get("MaxClockSpeed").u32_from_variant();
+        let number_of_cores = cpu.get("NumberOfCores").u32_from_variant();
 
         cpus.push(ComponentInfo {
             bus: ComponentBus::Sys,
