@@ -41,6 +41,38 @@ async fn index() -> impl Responder {
     "Hello from Actix Web! :D"
 }
 
+#[actix_web::get("/report")]
+async fn get_report(state: AppState, id: actix_web::web::Path<uuid::Uuid>) -> impl Responder {
+    // ask the database for the report with this uuid
+    let query = sqlx::query_as!(
+        WrappedReport,
+        r#"SELECT id, recv_time, report as "report: Json<Report>" FROM reports WHERE id = $1"#,
+        id.clone()
+    )
+    .fetch_one(&state.pool)
+    .await;
+
+    // ensure we got a report
+    let report = match query {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::warn!("Failed to find a report with the given UUID. (err: {e})");
+            return HttpResponse::NotFound()
+                .reason("Didn't find the report with the given UUID in the database.")
+                .finish();
+        }
+    };
+
+    // make it into the typescript one
+    let ts_report = WrappedReportTs::from(report);
+
+    // jsonify that mf
+
+    HttpResponse::Ok()
+        .reason("Successfully pulled report from the database.")
+        .json(ts_report)
+}
+
 #[actix_web::post("/add_report")]
 #[tracing::instrument(skip_all)]
 async fn add_report(state: AppState, report: String) -> impl Responder {
