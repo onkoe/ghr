@@ -17,3 +17,6 @@ see the project README for additional information."
 pub mod error;
 pub mod prelude;
 pub mod report;
+
+// re-export the prelude to the crate root
+pub use crate::prelude::public::*;

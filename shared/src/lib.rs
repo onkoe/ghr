@@ -1,4 +1,4 @@
-use libghr::prelude::Report;
+use libghr::Report;
 use sqlx::types::Json;
 use ts_rs::TS as TypeScript;
 
