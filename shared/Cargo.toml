@@ -1,0 +1,30 @@
+[package]
+name = "shared"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license-file.workspace = true
+
+[dependencies]
+ts-rs = { version = "10.0.0", features = [
+    "uuid",
+    "chrono",
+    "uuid-impl",
+    "chrono-impl",
+] }
+libghr = { path = "../libghr" }
+time = "0.3.36"
+uuid = { version = "1.11.0", features = ["serde", "v4"] }
+sqlx = { version = "0.8.2", default-features = false, features = [
+    "derive",
+    "json",
+    "postgres",
+] }
+chrono = { version = "0.4.38", default-features = false, features = [
+    "alloc",
+    "now",
+    "serde",
+] }
+serde = "1.0.210"
