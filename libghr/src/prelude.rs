@@ -1,6 +1,6 @@
 pub(crate) mod internal {
     #![allow(unused)]
-    pub use crate::{
+    pub(crate) use crate::{
         error::{GhrError, GhrResult},
         report::{
             components::cpu::{Cache, CpuDescription, Frequency},
@@ -12,6 +12,7 @@ pub(crate) mod internal {
             machine::MachineInfo,
             os::OperatingSystemInfo,
             system_config::SystemConfInfo,
+            util::unit_to_mibiunits,
             Report,
         },
     };
@@ -19,6 +20,10 @@ pub(crate) mod internal {
     // re-export the `wmi` helpers on windows
     #[cfg(target_os = "windows")]
     pub(crate) use crate::report::components::windows::{get_wmi, VariantInto};
+
+    // re-export `sysfs` helper on linux
+    #[cfg(target_os = "linux")]
+    pub(crate) use crate::report::util::linux::sysfs_value;
 
     // macro that exports to typescript bindings.
     // this prevents me from wasting 80 years doing hand-rolled serialization
