@@ -2,6 +2,7 @@ pub mod components;
 pub mod machine;
 pub mod os;
 pub mod system_config;
+pub(crate) mod util;
 
 use machine::MachineIdentifier;
 
