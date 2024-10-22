@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["backend", "libghr"]
+members = ["backend", "libghr", "shared"]
 
 [workspace.package]
 version = "0.1.0"
