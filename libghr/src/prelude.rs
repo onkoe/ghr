@@ -4,6 +4,7 @@ pub(crate) mod internal {
         error::{GhrError, GhrResult},
         report::{
             components::cpu::{Cache, CpuDescription, Frequency},
+            components::gpu::GpuDescription,
             components::ram::RamDescription,
             components::{
                 ComponentBus, ComponentDescription, ComponentInfo, ComponentStatus, Removability,
