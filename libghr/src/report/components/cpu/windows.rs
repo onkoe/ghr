@@ -69,7 +69,7 @@ pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
             class: None,
             vendor_id: manufacturer,
             status: None,
-            desc: ComponentDescription::CpuDescription {
+            desc: ComponentDescription::CpuDescription(CpuDescription {
                 clock_speed: Frequency {
                     min: None,
                     max: speed,
@@ -81,7 +81,7 @@ pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
                 //      page 65.
                 cache: None,
                 cores: None,
-            },
+            }),
         })
     }
 

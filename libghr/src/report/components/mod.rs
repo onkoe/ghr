@@ -1,5 +1,3 @@
-use cpu::{Cache, Core, Frequency};
-
 use crate::prelude::internal::*;
 
 pub mod cpu;
@@ -74,19 +72,7 @@ pub struct ComponentStatus {}
 #[non_exhaustive]
 pub enum ComponentDescription {
     /// About the central processing unit (CPU).
-    CpuDescription {
-        /// The CPU's clock speed in MHz. (ex: 3400 MHz)
-        clock_speed: Frequency,
-
-        /// The CPU's core count.
-        core_ct: Option<u32>,
-
-        /// Information about the CPU's cache.
-        cache: Option<Vec<Cache>>,
-
-        /// Information about each CPU core.
-        cores: Option<Vec<Core>>,
-    },
+    CpuDescription(CpuDescription),
 
     /// For the system memory.
     ///
@@ -94,19 +80,7 @@ pub enum ComponentDescription {
     /// per-stick info.
     ///
     /// Also, all values are in bytes.
-    RamDescription {
-        /// The total amount of physical memory.
-        total_phsyical_memory: Option<u64>,
-
-        /// The configured clock speed of this module, in MHz.
-        configured_clock_speed: Option<u32>,
-
-        /// The configured voltage of this module, in mW.
-        configured_voltage: Option<u32>,
-
-        /// Whether or not the module is removable.
-        removable: Option<Removability>,
-    },
+    RamDescription(RamDescription),
 
     /// No description is available for this device.
     None,

@@ -9,7 +9,7 @@ use tokio::fs;
 
 use crate::prelude::internal::*;
 
-use super::{Cache, Frequency};
+use super::{Cache, CpuDescription, Frequency};
 
 /// Grabs info about the computer's processor(s).
 #[tracing::instrument]
@@ -77,12 +77,12 @@ pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
         tracing::debug!("{id:?}");
 
         // create the ComponentDescription
-        let desc = ComponentDescription::CpuDescription {
+        let desc = ComponentDescription::CpuDescription(CpuDescription {
             clock_speed: cpu_best_speeds,
             core_ct,
             cache: Some(cpu_cache),
             cores: Some(cpu_cores),
-        };
+        });
 
         // finally, push it to the list
         components.push(ComponentInfo {
