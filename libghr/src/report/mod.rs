@@ -1,3 +1,4 @@
+pub mod bus;
 pub mod components;
 pub mod machine;
 pub mod os;
@@ -25,11 +26,17 @@ pub struct Report {
 impl Report {
     /// Attempts to assemble a new `Report`.
     pub async fn new() -> Result<Self, GhrError> {
-        Ok(Self {
-            os: Self::os_info()?,
-            machine: MachineInfo::new(MachineIdentifier::new_random()).await, // TODO: use the real one
+        let (os, machine, initial_components) = tokio::join! {
+            Self::os_info(),
+            MachineInfo::new(MachineIdentifier::new_random()),
+            bus::devices(),
+        };
 
-            components: components::get_components().await?,
+        Ok(Self {
+            os: os?,
+            machine, // TODO: use the real one
+
+            components: components::get_components(&mut initial_components?).await?,
 
             sys_conf: system_config::SystemConfInfo {},
         })

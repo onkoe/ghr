@@ -10,7 +10,9 @@ pub mod usb;
 ///
 /// Currently, this just supports USB and PCI. Additional device types will
 /// come soon!
-pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get_components(
+    initial_components: &mut Vec<InitialDevice>,
+) -> GhrResult<Vec<ComponentInfo>> {
     let (cpu, usb, pci, ram, gpus) = tokio::try_join! {
         cpu::cpu(),
         usb::usb_components(),
@@ -43,6 +45,32 @@ pub struct ComponentInfo {
 
     /// General information about the component.
     desc: ComponentDescription,
+}
+
+/// A [`ComponentInfo`] that hasn't yet been paired with an [`InitialDevice`].
+pub struct UnfinishedComponent {
+    info: ComponentInfo,
+}
+
+impl UnfinishedComponent {
+    /// When a list of `UnfinishedComponent`s has been created, you must
+    /// transform them into `ComponentInfo`s by giving them an initial device.
+    pub fn complete(self, bus_device: InitialDevice) -> ComponentInfo {
+        let mut info = self.info; // mutable to replace any missing fields
+        let bus_info = bus_device.info;
+
+        // replace our info with the bus info if none has been gathered.
+        if let ComponentBus::Sys = info.bus {
+            info.bus = bus_info.bus;
+        }
+        info.class = info.class.or(bus_info.class);
+        info.id = info.id.or(bus_info.id);
+        info.status = info.status.or(bus_info.status);
+        info.vendor_id = info.vendor_id.or(bus_info.vendor_id);
+
+        // return the combined version
+        info
+    }
 }
 
 /// The bus a component is on.

@@ -3,6 +3,7 @@ pub(crate) mod internal {
     pub(crate) use crate::{
         error::{GhrError, GhrResult},
         report::{
+            bus::InitialDevice,
             components::cpu::{Cache, CpuDescription, Frequency},
             components::gpu::GpuDescription,
             components::ram::RamDescription,

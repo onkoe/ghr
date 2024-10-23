@@ -11,7 +11,7 @@ pub type OsInfoReturnType = GhrResult<OperatingSystemInfo>;
 impl Report {
     /// Grabs operating system info for the hardware report.
     #[cfg(target_os = "linux")]
-    pub(crate) fn os_info() -> OsInfoReturnType {
+    pub(crate) async fn os_info() -> OsInfoReturnType {
         // we're on a Unix, so let's grab `utsname`
 
         use std::collections::BTreeMap;
@@ -71,9 +71,9 @@ impl Report {
 mod tests {
     use crate::report::Report;
 
-    #[test]
-    fn compile() {
-        Report::os_info().unwrap();
+    #[tokio::test]
+    async fn compile() {
+        Report::os_info().await.unwrap();
     }
 }
 
