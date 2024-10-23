@@ -1,5 +1,5 @@
 use regex::Regex;
-use tokio::fs::{self, DirEntry};
+use tokio::fs::{self, read_link, DirEntry};
 
 use crate::prelude::internal::*;
 
@@ -7,9 +7,49 @@ use crate::prelude::internal::*;
 const GPU_LISTING: &str = "/sys/class/drm";
 
 pub mod amdgpu;
+mod generic;
 
 pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
-    amdgpu::gpus().await
+    // grab devices from the system
+    let devices = devices().await?;
+
+    let mut list = vec![];
+
+    // we want to loop over each gpu. getting data for a gpu can be different
+    // for many reasons, particularly per driver.
+    for device in devices {
+        let path = device.path();
+        let path_str = path.display();
+
+        // get the driver for the gpu
+        let Ok(driver) = find_driver(device).await else {
+            tracing::warn!("Failed to find driver for device at `{path_str}`.",);
+            continue;
+        };
+
+        // based on the driver, pick an implementation to use
+        tracing::debug!("parsing gpu with `{driver}` driver at `{path_str}`...",);
+        let info = match driver.as_str() {
+            "amdgpu" => amdgpu::gpu(&path).await,
+            _ => {
+                tracing::warn!(
+                    "No information about this generic device. An \
+                empty output will result for this entry. (driver: {driver}, path: {path_str})"
+                );
+                generic::gpu(&path).await
+            }
+        };
+
+        // make sure everything went well
+        let Ok(info) = info else {
+            tracing::warn!("Couldn't parse info for GPU at `{path_str}`.");
+            continue;
+        };
+
+        list.push(info);
+    }
+
+    Ok(list)
 }
 
 /// gets the gpus on the system.
@@ -42,4 +82,28 @@ async fn devices() -> GhrResult<Vec<DirEntry>> {
     }
 
     Ok(gpus)
+}
+
+/// finds the driver for a device listing in `/sys/class/drm/cardN`.
+async fn find_driver(device: DirEntry) -> GhrResult<String> {
+    // first, we want to navigate to the `device` folder
+    let path = device.path().join("device");
+
+    // and then open up the `driver` dir, but return the folder it points to
+    // since it's a symlink
+    let driver_path = read_link(path.join("driver")).await.map_err(|e| {
+        tracing::error!("Couldn't find this GPU's driver! The `driver` dir should always be a symlink, but reading it failed. (err: {e})");
+        GhrError::ComponentInfoInaccessible(format!("Failed to follow GPU driver symlink. (err: {e}"))
+    })?;
+
+    // we only need that dir's name... as a string
+    let driver = driver_path
+        .file_name()
+        .ok_or(GhrError::ComponentInfoInaccessible(
+            "Failed to find the GPU driver dir's name".into(),
+        ))?
+        .to_string_lossy()
+        .to_string();
+
+    Ok(driver)
 }
