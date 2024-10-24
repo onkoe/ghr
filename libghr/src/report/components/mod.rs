@@ -15,7 +15,7 @@ pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
     let (cpu, usb, pci, ram, gpus, psus) = tokio::try_join! {
         cpu::cpu(),
         usb::usb_components(),
-        pci::pci_components(),
+        pci::get(),
         ram::ram(),
         gpu::gpu(),
         psu::get(),
@@ -24,7 +24,7 @@ pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
     Ok([cpu, usb, pci, ram, gpus, psus]
         .into_iter()
         .flatten()
-        .filter(|c| !c.is_blank())
+        .filter(|c: &ComponentInfo| !c.is_blank())
         .collect())
 }
 
