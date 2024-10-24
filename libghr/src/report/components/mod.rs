@@ -3,6 +3,7 @@ use crate::prelude::internal::*;
 pub mod cpu;
 pub mod gpu;
 pub mod pci;
+pub mod psu;
 pub mod ram;
 pub mod usb;
 
@@ -11,15 +12,19 @@ pub mod usb;
 /// Currently, this just supports USB and PCI. Additional device types will
 /// come soon!
 pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
-    let (cpu, usb, pci, ram, gpus) = tokio::try_join! {
+    let (cpu, usb, pci, ram, gpus, psus) = tokio::try_join! {
         cpu::cpu(),
         usb::usb_components(),
         pci::pci_components(),
         ram::ram(),
         gpu::gpu(),
+        psu::get(),
     }?;
 
-    Ok([cpu, usb, pci, ram, gpus].into_iter().flatten().collect())
+    Ok([cpu, usb, pci, ram, gpus, psus]
+        .into_iter()
+        .flatten()
+        .collect())
 }
 
 /// A representation of any single component in the machine.
@@ -86,6 +91,9 @@ pub enum ComponentDescription {
 
     /// About the graphics card (GPU).
     GpuDescription(GpuDescription),
+
+    /// Describes a power supply, like a battery or AC adapter.
+    PowerSupplyDescription(PowerSupplyDescription),
 
     /// No description is available for this device.
     None,

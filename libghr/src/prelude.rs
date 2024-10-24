@@ -5,6 +5,7 @@ pub(crate) mod internal {
         report::{
             components::cpu::{Cache, CpuDescription, Frequency},
             components::gpu::GpuDescription,
+            components::psu::PowerSupplyDescription,
             components::ram::RamDescription,
             components::{
                 ComponentBus, ComponentDescription, ComponentInfo, ComponentStatus, Removability,
