@@ -23,7 +23,7 @@ pub(crate) mod internal {
 
     // re-export `sysfs` helper on linux
     #[cfg(target_os = "linux")]
-    pub(crate) use crate::report::util::linux::sysfs_value;
+    pub(crate) use crate::report::util::linux::{sysfs_value, sysfs_value_opt};
 
     // macro that exports to typescript bindings.
     // this prevents me from wasting 80 years doing hand-rolled serialization

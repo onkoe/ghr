@@ -29,3 +29,18 @@ where
         GhrError::ComponentInfoWeirdInfo(format!("Failed to parse value from string. (value: `{string}`, err: {e})"))
     })
 }
+
+/// returns a value of type `V` from the file at `path`.
+///
+/// this string is trimmed to prevent parsing errors.
+///
+/// note that this version of the function ignores any errors and converts
+/// directly to `Option` instead.
+#[tracing::instrument]
+pub(crate) async fn sysfs_value_opt<V>(path: impl AsRef<Path> + Debug) -> Option<V>
+where
+    V: FromStr,
+    V::Err: Display, // ensure its error can be printed
+{
+    sysfs_value::<V>(path).await.ok()
+}
