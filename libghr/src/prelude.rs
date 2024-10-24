@@ -24,6 +24,10 @@ pub(crate) mod internal {
 
     // re-export `sysfs` helper on linux
     #[cfg(target_os = "linux")]
+    pub(crate) use crate::report::components::pci::linux::{
+        convert_to_pci_class, convert_to_pci_names,
+    };
+    #[cfg(target_os = "linux")]
     pub(crate) use crate::report::util::linux::{sysfs_value, sysfs_value_opt};
 
     // macro that exports to typescript bindings.
