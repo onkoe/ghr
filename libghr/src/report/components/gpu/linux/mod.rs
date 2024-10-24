@@ -6,7 +6,7 @@ use crate::prelude::internal::*;
 /// a static path where gpus reprs are placed by the kernel/drivers
 const GPU_LISTING: &str = "/sys/class/drm";
 
-pub mod amdgpu;
+mod amdgpu;
 mod generic;
 
 pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
