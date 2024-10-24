@@ -24,6 +24,7 @@ pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
     Ok([cpu, usb, pci, ram, gpus, psus]
         .into_iter()
         .flatten()
+        .filter(|c| !c.is_blank())
         .collect())
 }
 
