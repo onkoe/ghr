@@ -8,6 +8,7 @@ const GPU_LISTING: &str = "/sys/class/drm";
 
 mod amdgpu;
 mod generic;
+mod i915;
 
 pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
     // grab devices from the system
@@ -31,6 +32,7 @@ pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
         tracing::debug!("parsing gpu with `{driver}` driver at `{path_str}`...",);
         let info = match driver.as_str() {
             "amdgpu" => amdgpu::gpu(&path).await,
+            "i915" => i915::gpu(&path).await,
             _ => {
                 tracing::warn!(
                     "No information about this generic device. An \
