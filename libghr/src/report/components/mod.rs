@@ -50,6 +50,19 @@ pub struct ComponentInfo {
     desc: ComponentDescription,
 }
 
+impl ComponentInfo {
+    /// Checks if a component is "blank" - meaning it has no fields filled out.
+    ///
+    /// In other words, if all of its fields are `None`.
+    pub fn is_blank(&self) -> bool {
+        self.id.is_none()
+            && self.class.is_none()
+            && self.vendor_id.is_none()
+            && self.status.is_none()
+            && matches!(self.desc, ComponentDescription::None)
+    }
+}
+
 /// The bus a component is on.
 #[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
