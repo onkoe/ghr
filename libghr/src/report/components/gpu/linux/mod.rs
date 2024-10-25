@@ -30,9 +30,15 @@ pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
 
         // based on the driver, pick an implementation to use
         tracing::debug!("parsing gpu with `{driver}` driver at `{path_str}`...",);
-        let info = match driver.as_str() {
+        let info = match driver.to_ascii_lowercase().as_str() {
             "amdgpu" => amdgpu::gpu(&path).await,
             "i915" => i915::gpu(&path).await,
+            "nvidia" => {
+                // ignore nvidia gpus; they're located with `nvml`, not `sysfs`
+                //
+                // (see `super::nvidia` for more info)
+                continue;
+            }
             _ => {
                 tracing::warn!(
                     "No information about this generic device. An \
