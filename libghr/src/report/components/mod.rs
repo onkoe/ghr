@@ -69,11 +69,14 @@ impl ComponentInfo {
 #[non_exhaustive]
 pub enum ComponentBus {
     Pci,
+    Pcie,
     Usb,
     Sys,
     Ps2,
     Serial,
     Eisa,
+    Fpci,
+    Agp,
 
     // mostly hard drive stuff
     Nvme,
