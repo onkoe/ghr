@@ -126,3 +126,71 @@ async fn battery_info(path: &Path) -> Option<PowerSupplyDescription> {
 fn uwh_to_wh(uwh: u64) -> f64 {
     (uwh as f64) / 1_000_000_f64
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn psu_linux_info() {
+        let path = psu_linux_path().join("BAT1");
+        let psu = one(path).await.unwrap();
+
+        // check vendor
+        assert_eq!(psu.vendor_id.unwrap(), "SMP");
+
+        // check model (yes, this sample was a number)
+        assert_eq!(psu.id.unwrap(), "1144021016");
+
+        // i haven't yet seen a class on linux. so we'll test on it
+        assert!(psu.class.is_none());
+    }
+
+    #[tokio::test]
+    async fn psu_linux_specs() {
+        let path = psu_linux_path().join("BAT1");
+        let psu = one(path).await.unwrap();
+
+        let ComponentDescription::PowerSupplyDescription(psu_info) = psu.desc else {
+            panic!("no psu info found D:");
+        };
+
+        let PowerSupplyDescription::Battery {
+            technology,
+            real_capacity_wh,
+            theoretical_capacity_wh,
+            cycle_count,
+        } = psu_info
+        else {
+            panic!("wasn't considered a battery");
+        };
+
+        // battery composition (technology)
+        assert_eq!(technology.unwrap(), "Li-ion");
+
+        // ideal capacity
+        assert!(almost::equal(theoretical_capacity_wh.unwrap(), 56.31));
+
+        // fr capacity
+        assert!(almost::equal(real_capacity_wh.unwrap(), 52.22));
+
+        // cycle count
+        assert_eq!(cycle_count.unwrap(), 37);
+    }
+
+    #[test]
+    fn check_uwh_conversion() {
+        let wh = 99.0;
+        let uwh = 99_000_000;
+
+        assert!(almost::equal(uwh_to_wh(uwh), wh));
+    }
+
+    #[tracing::instrument]
+    fn psu_linux_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!(
+            "{root}/tests/assets/linux/sysfs/sys/class/power_supply"
+        ))
+    }
+}
