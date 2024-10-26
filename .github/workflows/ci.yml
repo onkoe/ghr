@@ -152,5 +152,10 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
+            - name: Ensure we have `cmake`
+              run: apt update && apt install -y cmake
+
             - name: Check semver
               uses: obi1kenobi/cargo-semver-checks-action@v2
+              with:
+                  package: libghr
