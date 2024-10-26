@@ -6,30 +6,28 @@ use crate::prelude::internal::*;
 pub(super) async fn gpu(gpu: &Path) -> GhrResult<ComponentInfo> {
     // grab some id info about the gpu
     let (id, vendor_id, class) = tokio::join! {
-        sysfs_value::<String>(gpu.join("device")),
-        sysfs_value::<String>(gpu.join("vendor")),
-        sysfs_value::<String>(gpu.join("class")),
+        sysfs_value_opt::<String>(gpu.join("device")),
+        sysfs_value_opt::<String>(gpu.join("vendor")),
+        sysfs_value_opt::<String>(gpu.join("class")),
     };
+
+    // turn them into human-readable strings, if possible
+    let (class, (id, vendor_id)) = (
+        convert_to_pci_class(class),
+        convert_to_pci_names(id, vendor_id),
+    );
+
+    println!("path: {gpu:#?}");
 
     // and now some device info
-    let (vram, clock_speed, memory_speed) = tokio::join! {
-        sysfs_value::<u64>(gpu.join("mem_info_vram_total")),
-        sysfs_value::<u64>(gpu.join("hwmon/hwmon0/freq1_input")),
-        sysfs_value::<u64>(gpu.join("hwmon/hwmon0/freq2_input")),
+    let (video_memory, clock_speed, video_memory_speed) = tokio::join! {
+        sysfs_value_opt::<u64>(gpu.join("mem_info_vram_total")),
+        gpu_clock(gpu),
+        gpu_mem_clock(gpu)
     };
-
-    // convert useless io errors to option
-    let (id, vendor_id, class) = (id.ok(), vendor_id.ok(), class.ok());
-    let (video_memory, clock_speed, video_memory_speed) =
-        (vram.ok(), clock_speed.ok(), memory_speed.ok());
 
     // map units to mibiunits
     let video_memory = video_memory.map(unit_to_mibiunits);
-    let clock_speed =
-        clock_speed
-            .map(unit_to_mibiunits)
-            .and_then(|cs| if cs == 0 { None } else { Some(cs) });
-    let video_memory_speed = video_memory_speed.map(unit_to_mibiunits);
 
     // create the device
     let gpu_info = GpuDescription {
@@ -111,3 +109,95 @@ async fn clock<S: AsRef<str> + std::fmt::Debug>(gpu: &Path, file: S) -> Option<u
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn amdgpu_linux() {
+        logger();
+
+        let path = amdgpu_path();
+        _ = gpu(&path).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn amdgpu_linux_device_ids() {
+        logger();
+
+        let path = amdgpu_path();
+        let info = gpu(&path).await.unwrap();
+
+        // class
+        assert_eq!(
+            "Display controller (VGA compatible controller)",
+            info.class.unwrap(),
+            "device class"
+        );
+
+        // vendor
+        assert_eq!(
+            "Advanced Micro Devices, Inc. [AMD/ATI]",
+            info.vendor_id.unwrap(),
+            "device vendor"
+        );
+
+        // device
+        assert_eq!(
+            "Navi 22 [Radeon RX 6700/6700 XT/6750 XT / 6800M]",
+            info.id.unwrap(),
+            "device name"
+        );
+    }
+
+    #[tokio::test]
+    async fn amdgpu_linux_device_specs() {
+        logger();
+
+        let path = amdgpu_path();
+        let info = gpu(&path).await.unwrap();
+
+        // make sure we saw a gpu here
+        let ComponentDescription::GpuDescription(specs) = info.desc else {
+            panic!("expected a gpu description, got: {:?}", info.desc);
+        };
+
+        // vram amount
+        assert_eq!(12272, specs.video_memory.unwrap(), "total vram");
+
+        // clock speed
+        assert_eq!(2880, specs.clock_speed.unwrap(), "clock speed");
+
+        // vram clock speed
+        assert_eq!(1124, specs.video_memory_speed.unwrap(), "vram clock");
+    }
+
+    #[tokio::test]
+    async fn amdgpu_linux_clock() {
+        logger();
+
+        let path = amdgpu_path();
+        let clk = gpu_clock(&path).await.unwrap();
+
+        assert_eq!(clk, 2880, "clock speed func");
+    }
+
+    #[tokio::test]
+    async fn amdgpu_linux_memory_clock() {
+        logger();
+
+        let path = amdgpu_path();
+        let clk = gpu_mem_clock(&path).await.unwrap();
+
+        assert_eq!(clk, 1124, "mem speed func");
+    }
+
+    #[tracing::instrument]
+    fn amdgpu_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!(
+            "{root}/tests/assets/linux/sysfs/sys/class/drm/card1/device"
+        ))
+    }
+}
