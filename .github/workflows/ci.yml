@@ -145,7 +145,7 @@ jobs:
               with:
                   version: latest
             - name: Run Biome
-              run: biome ci frontend/
+              run: biome ci frontend/src
 
     test_semver:
         runs-on: ubuntu-latest

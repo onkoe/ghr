@@ -6,11 +6,33 @@
         "useIgnoreFile": false
     },
     "files": { "ignoreUnknown": false, "ignore": [] },
-    "formatter": { "enabled": true, "indentStyle": "tab" },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4
+    },
     "organizeImports": { "enabled": true },
     "linter": {
         "enabled": true,
         "rules": { "recommended": true }
     },
-    "javascript": { "formatter": { "quoteStyle": "double" } }
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "double",
+            "indentStyle": "space",
+            "indentWidth": 4
+        }
+    },
+    "json": {
+        "formatter": {
+            "indentStyle": "space",
+            "indentWidth": 4
+        }
+    },
+    "css": {
+        "formatter": {
+            "indentStyle": "space",
+            "indentWidth": 4
+        }
+    }
 }
