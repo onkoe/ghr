@@ -153,7 +153,7 @@ jobs:
             - uses: actions/checkout@v3
 
             - name: Ensure we have `cmake`
-              run: apt update && apt install -y cmake
+              run: sudo apt update && sudo apt install -y cmake
 
             - name: Check semver
               uses: obi1kenobi/cargo-semver-checks-action@v2
