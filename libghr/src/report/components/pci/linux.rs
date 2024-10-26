@@ -38,6 +38,8 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
 }
 
 /// converts the device + vendor id to strings via pci lookup
+///
+/// NOTE: this returns the idents in `(id, vendor_id)` order.
 #[tracing::instrument]
 pub fn convert_to_pci_names(
     id: Option<String>,

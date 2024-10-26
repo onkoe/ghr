@@ -2,8 +2,8 @@
 pub(crate) mod linux;
 
 #[tracing::instrument(skip(value))]
-/// converts a unit from units to mibiunits. for example, 1024 bytes becomes
-/// 1 KiB.
+/// converts a unit from units to mibiunits. for example, 1024^2 bytes
+/// becomes 1 MiB.
 pub(crate) fn unit_to_mibiunits(value: impl Into<u64>) -> u32 {
     const UNIT_CONV: u64 = 1_048_576;
 
@@ -18,6 +18,7 @@ pub(crate) fn unit_to_mibiunits(value: impl Into<u64>) -> u32 {
 #[tracing::instrument]
 pub(crate) fn logger() {
     _ = tracing_subscriber::fmt()
+        .pretty()
         .with_max_level(tracing::Level::DEBUG)
         .try_init();
 }
