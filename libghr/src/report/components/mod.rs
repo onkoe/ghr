@@ -64,6 +64,44 @@ impl ComponentInfo {
             && self.status.is_none()
             && matches!(self.desc, ComponentDescription::None)
     }
+
+    /// Gets the "bus" this component this was attached to during report creation.
+    #[tracing::instrument(skip(self))]
+    pub fn bus(&self) -> ComponentBus {
+        self.bus.clone()
+    }
+
+    /// Gets the name for this component.
+    #[tracing::instrument(skip(self))]
+    pub fn id(&self) -> Option<String> {
+        self.id.clone()
+    }
+
+    /// Gets the class for this component.
+    #[tracing::instrument(skip(self))]
+    pub fn class(&self) -> Option<String> {
+        self.id.clone()
+    }
+
+    /// Gets the vendor (manufacturer) name for this component.
+    #[tracing::instrument(skip(self))]
+    pub fn vendor_id(&self) -> Option<String> {
+        self.vendor_id.clone()
+    }
+
+    /// Returns any status info about this component.
+    #[tracing::instrument(skip(self))]
+    pub fn status(&self) -> Option<ComponentStatus> {
+        self.status.clone()
+    }
+
+    /// Gets this component's specific description.
+    ///
+    /// These contain info that describes the specifications of a component.
+    #[tracing::instrument(skip(self))]
+    pub fn desc(&self) -> ComponentDescription {
+        self.desc.clone()
+    }
 }
 
 /// The bus a component is on.
