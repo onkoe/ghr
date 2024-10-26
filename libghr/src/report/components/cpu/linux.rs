@@ -492,13 +492,6 @@ mod tests {
     }
 
     #[tracing::instrument]
-    fn logger() {
-        _ = tracing_subscriber::fmt()
-            .with_max_level(tracing::Level::DEBUG)
-            .try_init();
-    }
-
-    #[tracing::instrument]
     fn cpu_path() -> PathBuf {
         let root = env!("CARGO_MANIFEST_DIR");
         PathBuf::from(format!(

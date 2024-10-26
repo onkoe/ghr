@@ -30,6 +30,10 @@ pub(crate) mod internal {
     #[cfg(target_os = "linux")]
     pub(crate) use crate::report::util::linux::{sysfs_value, sysfs_value_opt};
 
+    // export logger creating fn for unit tests
+    #[cfg(test)]
+    pub(crate) use crate::report::util::logger;
+
     // macro that exports to typescript bindings.
     // this prevents me from wasting 80 years doing hand-rolled serialization
     pub use ts_rs::TS as TypeScript;
