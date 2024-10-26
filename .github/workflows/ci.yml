@@ -1,68 +1,96 @@
 name: ci (rust + web)
 
 on:
-  push:
-  pull_request:
+    push:
+    pull_request:
 
 env:
-  CARGO_TERM_COLOR: always
+    CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
-    name: build + test (rust, linux)
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        toolchain:
-          - stable
-          - nightly
-      fail-fast: false
+    build_and_test:
+        name: build + test (rust, linux)
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                toolchain:
+                    - stable
+                    - nightly
+            fail-fast: false
 
-    steps:
-      - uses: actions/checkout@v4
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Set up Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ matrix.toolchain }}
+            - name: Set up Rust toolchain
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  toolchain: ${{ matrix.toolchain }}
 
-      - name: Cache cargo registry
-        uses: actions/cache@v3
-        with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+            - name: Cache cargo registry
+              id: cargo-reg-cache
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cargo/registry
+                  key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Cache cargo index
-        uses: actions/cache@v3
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+            - name: Cache cargo index
+              id: cargo-index-cache
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cargo/git
+                  key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Cache cargo build
-        uses: actions/cache@v3
-        with:
-          path: target
-          key: ${{ runner.os }}-cargo-build-target-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
+            - name: Cache cargo build
+              id: cargo-build-cache
+              uses: actions/cache@v4
+              with:
+                  path: target
+                  key: ${{ runner.os }}-cargo-build-target-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Cache cargo bin
-        uses: actions/cache@v3
-        with:
-          path: ~/.cargo/bin
-          key: ${{ runner.os }}-cargo-bin-${{ hashFiles('**/Cargo.lock') }}
+            - name: Cache cargo bin
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cargo/bin
+                  key: ${{ runner.os }}-cargo-bin-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Build
-        run: cargo build
+            - name: Build
+              run: cargo build
 
-      - name: Install `cargo-nextest`
-        uses: taiki-e/install-action@nextest
+            # save all the caches real quick
 
-      - name: Run tests
-        run: cargo nextest run --no-fail-fast
+            - name: Save cargo registry cache before testing
+              id: cargo-reg-save
+              uses: actions/cache/restore@v4
+              with:
+                  path: ~/.cargo/registry
+                  key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Run doctests
-        run: cargo test --doc
+            - name: Save cargo index cache before testing
+              id: cargo-index-save
+              uses: actions/cache/restore@v4
+              with:
+                  path: ~/.cargo/git
+                  key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
 
-  windows_build:
+            - name: Save cargo build cache before testing
+              id: cargo-build-save
+              uses: actions/cache/restore@v4
+              with:
+                  path: target
+                  key: ${{ runner.os }}-cargo-build-target-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
+
+            # ok all good, continue with the tests
+
+            - name: Install `cargo-nextest`
+              uses: taiki-e/install-action@nextest
+
+            - name: Run tests
+              run: RUST_BACKTRACE=1 cargo nextest run --no-fail-fast --verbose
+
+            - name: Run doctests
+              run: cargo test --doc
+
+    windows_build:
         name: build (rust, windows)
         runs-on: windows-latest
         strategy:
@@ -70,60 +98,59 @@ jobs:
                 toolchain:
                     - stable
             fail-fast: false
-  
+
         steps:
             - uses: actions/checkout@v4
-  
+
             - name: Set up Rust toolchain
               uses: dtolnay/rust-toolchain@stable
               with:
-                toolchain: ${{ matrix.toolchain }}
+                  toolchain: ${{ matrix.toolchain }}
 
             - name: Cache cargo registry
               uses: actions/cache@v3
               with:
-                path: ~/.cargo/registry
-                key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+                  path: ~/.cargo/registry
+                  key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
 
             - name: Cache cargo index
               uses: actions/cache@v3
               with:
-                path: ~/.cargo/git
-                key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+                  path: ~/.cargo/git
+                  key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
 
             - name: Cache cargo build
               uses: actions/cache@v3
               with:
-                path: target
-                key: ${{ runner.os }}-cargo-build-target-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
-  
+                  path: target
+                  key: ${{ runner.os }}-cargo-build-target-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
+
             - name: Cache cargo bin # bc wow why does it take three minutes to build `cargo-deny`
               uses: actions/cache@v3
               with:
-                path: ~/.cargo/bin
-                key: ${{ runner.os }}-cargo-bin-${{ hashFiles('**/Cargo.lock') }}
+                  path: ~/.cargo/bin
+                  key: ${{ runner.os }}-cargo-bin-${{ hashFiles('**/Cargo.lock') }}
 
             - name: Build
               run: cargo build
 
-  web:
-    name: lint web stuff
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
-        with:
-          version: latest
-      - name: Run Biome
-        run: biome ci frontend/
+    web:
+        name: lint web stuff
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Biome
+              uses: biomejs/setup-biome@v2
+              with:
+                  version: latest
+            - name: Run Biome
+              run: biome ci frontend/
 
-  test_semver:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    test_semver:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Check semver
-        uses: obi1kenobi/cargo-semver-checks-action@v2
-
+            - name: Check semver
+              uses: obi1kenobi/cargo-semver-checks-action@v2

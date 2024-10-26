@@ -471,14 +471,19 @@ mod tests {
         let cache = core_cache(&path).await;
 
         // get a cache for each
-        let mut iter_cache = cache.iter();
         assert_eq!(cache.len(), 4, "there are four cache directories.");
 
-        let l1 = iter_cache
+        // let's print the cache level for each!
+        for (i, c) in cache.iter().enumerate() {
+            eprintln!("cache {i}: level {}", c.level);
+        }
+
+        let l1 = cache
+            .iter()
             .find(|c| c.level == 1 && c.size == 64)
             .expect("missing L1");
-        let l2 = iter_cache.find(|c| c.level == 2).expect("missing L2");
-        let l3 = iter_cache.find(|c| c.level == 3).expect("missing L3");
+        let l2 = cache.iter().find(|c| c.level == 2).expect("missing L2");
+        let l3 = cache.iter().find(|c| c.level == 3).expect("missing L3");
 
         // check the size of each
         assert_eq!(l1.size, 64); // K
