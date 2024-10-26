@@ -2,155 +2,30 @@
 Barrett Ray <barrettrjay@protonmail.com>
 v0.0, 2024-10-13
 
-A global hardware report, intended to allow anyone to gain insight into computer hardware the world over.
+A global hardware report, intended to allow anyone to gain insight into computer hardware.
 
-For now, this README is structured like a "project proposal" as shown in https://asana.com/resources/project-proposal[this webpage] by Asana. In the future, this will change. It's just here for ease of access.
+== Layout
 
-== Executive Summary
+This is a bit of a monorepo. It includes everything related to GHR, including the website and surrounding tools.
 
-TODO.
+Let's review the major files/directories:
 
+* `Cargo.toml`: makes this into a Rust workspace.
+* `libghr`: the Rust library that creates reports.
+* `shared`: currently just exports the `libghr::Report` type for use in TypeScript.
+* `frontend`: the website's frontend (viewable parts), written in React.
+* `backend`: the website's backend (server stuff), made in Rust.
 
+== Usage
 
+Currently, there are no formal CLI/GUI tools to generate reports. However, you can head into link:./libghr/[`libghr`] and check out the examples to get something now.
 
+== License
 
+All source files in the GHR project are licensed under the Mozilla Public License 2.0. For additional information, see the link:./LICENSE[project license].
 
+== Contributing
 
+Outside contributions are welcomed! If you're making a bug fix, please feel free to pop in whenever. However, feature contributions (like new hardware) should be discussed before implementation. Please make an issue in that case.
 
-
-
-
-
-== Problem + Background
-
-There are existing solutions to get information about computing hardware and their configurations, but they have significant problems...
-
-=== `hw-probe` - The Linux Hardware Project
-
-https://linux-hardware.org/?view=howto[This tool], part of a larger project called "Hardware for Linux and BSD" or the "Linux Hardware Project", assists users in elegantly collecting and uploading their system information to the web.
-
-Unfortunately, it has some problems:
-
-* *Single-platform*
-** This tool only works on Linux and a select few BSDs.
-** Most people run Windows on their computers, so:
-*** the tool has limited troubleshooting viability,
-*** most people cannot use it
-*** collected hardware info is limited to what _works_ with linux
-
-* *Limited search functionality*
-** Attempting to sort through the database is a bit of a pain.
-** It offers limited sort/filter options.
-** Changing these options requires a full page refresh, and all your options will be reset if you change any prior option.
-
-* *Not user-facing*
-** Unfortunately, this software requires usage of the terminal to install and employ.
-** This limits the project's scope, but also its utility.
-*** Only technical users can submit reports.
-*** This might affect the diversity of submissions, lowering the quality of the database.
-** A tool that can be bundled with other binaries to create bug reports would be preferable.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-== Solution
-
-GHR.
-
-* *Cross-platform*
-** Supports all kinds of devices, including Windows/Linux/BSD computers, Android phones, and potentially other variable hardware.
-** Not targeting Apple support just yet. Most info about these devices is well-known since releases are typically uniform in hardware.
-
-* *Search*
-** The database is exposed through an API.
-** To speed things up and maintain more info about the search, we use client-side rendering.
-** Sorts
-*** Alphabetical (by model name/etc.)
-*** Date submitted
-*** Random
-** Filters: everything that is reported and enumerated is filterable
-** Adherence Mode
-*** A special kind of sort mode that uses filters as "wants"/"needs"/etc. in computer hardware.
-*** In other words, it helps folks find a machine they want.
-
-== Deliverables
-
-* *libghr*: The underlying library that provides an all-in-one interface to create reports.
-** Built in Rust.
-*** Uses `#[cfg(target_os = "...")]` blocks to create the simplified interface.
-** Exposes only a few simple types:
-*** [ ] `ReportBuilder`: an object that attempts to create a report
-*** [ ] `Report`: a type with lots of fields for hardware information. See below.
-
-[source,rust]
-----
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
-#[non_exhaustive]
-pub struct Report {
-    os: OperatingSystemInfo,
-    arch: CpuArchitecture,
-    machine: MachineInfo,
-
-    /// Information about each hardware component.
-
-    /// A general system report
-}
-
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, serde::Serialize, serde::Deserialize)]
-#[non_exhaustive]
-pub struct MachineInfo {
-
-}
-
-/// A representation of any single component in the machine.
-pub struct ComponentInfo {
-    bus: ComponentBus,
-    id: String,
-    class: String,
-}
-----
-
-
-* CLI
-** User reports are single-command.
-** Expects elevation. Require a flag (maybe `--no-elevation`) to create limited reports without it.
-*** note for unix: `sudo -E` (preserve user environment variables when elevated) is sometimes necessary for getting important configuration info.
-** Installation is uninvolved
-*** Linux
-**** [ ] prefer AppImage, support others
-*** Windows
-**** [ ] Just a binary
-
-* GUI
-** [ ] Users can point-and-click to create and upload a hardware report.
-** Installation is very easy
-*** Windows
-**** [ ] No external dependencies
-**** [ ] Installer/setup wizard
-**** [ ] Auto-updater
-*** Linux/BSD
-**** [ ] Flatpak supported and works in entirety. (this is the main Linux target)
-**** [ ] AppImage
-**** [ ] `just` build scripts allow for future Linux/BSD packaging support
-*** Android
-**** [ ] No vendor dependencies (F-Droid/etc. support)
-**** [ ] Best-effort distribution/ROM identification
-
-* Database API (maybe this includes the whole website backend?): TODO
-
-* Website: TODO
-
-== Resources and Requirements
-
-== Conclusion
+In addition, please ensure your commits use https://www.conventionalcommits.org/en/v1.0.0[Conventional Commits] style and that any changes uphold semantic versioning. (e.g., `#[non_exhaustive]` on public types, etc.)
