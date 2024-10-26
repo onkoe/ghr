@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use crate::{prelude::internal::*, report::components};
 
+/// Grabs info about all system power supplies.
 #[tracing::instrument]
 pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     // the path to all linux power supplies is located at `/sys/class/power_supply`.
@@ -12,37 +13,48 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
         // grab the component's path
         let path = dev.path();
 
-        // read a few files to get important info about this thang
-        let (vendor_id, id, kind) = tokio::join! {
-            sysfs_value_opt::<String>(path.join("manufacturer")),
-            sysfs_value_opt::<String>(path.join("model_name")),
-            sysfs_value_opt::<String>(path.join("type")),
-        };
-
-        // get extra info depending on the type of supply
-        let psu_info = if let Some(kind) = kind {
-            psu_info(&kind, &path)
-                .await
-                .map(ComponentDescription::PowerSupplyDescription)
-                .unwrap_or(ComponentDescription::None)
-        } else {
-            ComponentDescription::None
-        };
-
-        psus.push(ComponentInfo {
-            bus: ComponentBus::Sys, // TODO
-            id,
-            class: None,
-            vendor_id,
-            status: None,
-            desc: psu_info,
-        })
+        if let Some(unit) = one(path).await {
+            psus.push(unit)
+        }
     }
 
     Ok(psus)
 }
 
-#[tracing::instrument(skip(kind, path))]
+/// returns a representation of a component at `path`, if one exists.
+#[tracing::instrument]
+async fn one<P: AsRef<Path> + std::fmt::Debug>(path: P) -> Option<ComponentInfo> {
+    // get a reference to the given path
+    let path = path.as_ref();
+
+    // read a few files to get important info about this thang
+    let (vendor_id, id, kind) = tokio::join! {
+        sysfs_value_opt::<String>(path.join("manufacturer")),
+        sysfs_value_opt::<String>(path.join("model_name")),
+        sysfs_value_opt::<String>(path.join("type")),
+    };
+
+    // get extra info depending on the type of supply
+    let psu_info = if let Some(kind) = kind {
+        psu_info(&kind, path)
+            .await
+            .map(ComponentDescription::PowerSupplyDescription)
+            .unwrap_or(ComponentDescription::None)
+    } else {
+        ComponentDescription::None
+    };
+
+    Some(ComponentInfo {
+        bus: ComponentBus::Sys,
+        id,
+        class: None,
+        vendor_id,
+        status: None,
+        desc: psu_info,
+    })
+}
+
+#[tracing::instrument]
 /// matches on the type of power supply this device is and runs the appropriate
 /// function
 async fn psu_info(kind: &str, path: &Path) -> Option<PowerSupplyDescription> {
@@ -52,7 +64,7 @@ async fn psu_info(kind: &str, path: &Path) -> Option<PowerSupplyDescription> {
     }
 }
 
-#[tracing::instrument(skip(path))]
+#[tracing::instrument]
 /// finds info about a battery
 async fn battery_info(path: &Path) -> Option<PowerSupplyDescription> {
     // this is a lot of stuff but it's fine
@@ -109,7 +121,7 @@ async fn battery_info(path: &Path) -> Option<PowerSupplyDescription> {
     })
 }
 
-#[tracing::instrument(skip(uwh))]
+#[tracing::instrument]
 /// converts microwatt-hours to watt-hours
 fn uwh_to_wh(uwh: u64) -> f64 {
     (uwh as f64) / 1_000_000_f64
