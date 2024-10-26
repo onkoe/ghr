@@ -47,3 +47,67 @@ pub(super) async fn gpu(gpu: &Path) -> GhrResult<ComponentInfo> {
         desc: ComponentDescription::GpuDescription(gpu_info),
     })
 }
+
+/// returns the gpu clock speed in MHz.
+#[tracing::instrument]
+async fn gpu_clock(gpu: &Path) -> Option<u32> {
+    clock(gpu, "pp_dpm_sclk").await
+}
+
+/// returns the gpu memory clock speed in MHz.
+#[tracing::instrument]
+async fn gpu_mem_clock(gpu: &Path) -> Option<u32> {
+    clock(gpu, "pp_dpm_mclk").await
+}
+
+/// gets some speed in MHz from the given source.
+///
+/// this is for the `amdgpu` driver only, and it's a helper function.
+///
+/// (in other words, don't call with weird stuff)
+#[tracing::instrument]
+async fn clock<S: AsRef<str> + std::fmt::Debug>(gpu: &Path, file: S) -> Option<u32> {
+    let file = file.as_ref();
+    println!("in clock: {}, {file}", gpu.display());
+
+    let Some(clk_string) = sysfs_value_opt::<String>(gpu.join(file)).await else {
+        tracing::warn!("The `{file}` file does not exist for the given GPU.");
+        return None;
+    };
+
+    // great, it exists! now the file we've got should look like this:
+    //
+    //  ```
+    //  0: 500Mhz *
+    //  1: 2880Mhz
+    //  ```
+    //
+    // the last (nth) line has that maximum value we're looking for
+
+    // skip first line
+    let Some(clk_line) = clk_string.lines().last() else {
+        tracing::warn!("The `{file}` file was blank.");
+        return None;
+    };
+
+    // split on the space after `n:`, then use the second part of the string
+    let Some(clk_str_mhz) = clk_line.trim().split_ascii_whitespace().nth(1) else {
+        tracing::warn!("Failed to parse the `MHz` part of the `{file}` file.");
+        return None;
+    };
+
+    // replace the "Mhz" with nothing
+    let clk_str_mhz = clk_str_mhz.replace("Mhz", "");
+
+    // try parsing it into a value
+    match clk_str_mhz.trim().parse::<u32>() {
+        Ok(clk) => Some(clk),
+        Err(e) => {
+            tracing::warn!(
+                "Failed to parse clock speed as `u32` value! (str: `{clk_str_mhz}`, err: {e}"
+            );
+            None
+        }
+    }
+}
+
