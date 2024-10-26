@@ -11,15 +11,15 @@ use crate::prelude::internal::*;
 #[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub struct Report {
-    os: OperatingSystemInfo,
-    machine: MachineInfo,
+    pub os: OperatingSystemInfo,
+    pub machine: MachineInfo,
 
     /// Information about each hardware component.
-    components: Vec<ComponentInfo>,
+    pub components: Vec<ComponentInfo>,
 
     /// A general system report on installed software, drivers, and other
     /// system configuration elements.
-    sys_conf: SystemConfInfo,
+    pub sys_conf: SystemConfInfo,
 }
 
 impl Report {
