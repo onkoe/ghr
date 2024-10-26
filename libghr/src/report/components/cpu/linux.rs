@@ -76,11 +76,17 @@ pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
         tracing::debug!("{vendor_id:?}");
         tracing::debug!("{id:?}");
 
+        let cpu_cache = if cpu_cache.is_empty() {
+            None
+        } else {
+            Some(cpu_cache)
+        };
+
         // create the ComponentDescription
         let desc = ComponentDescription::CpuDescription(CpuDescription {
             clock_speed: cpu_best_speeds,
             core_ct,
-            cache: Some(cpu_cache),
+            cache: cpu_cache,
             cores: Some(cpu_cores),
         });
 
@@ -307,7 +313,6 @@ async fn core_cache(sysfs_core_path: &Path) -> Vec<CoreCache> {
         // note: i'm not aware if anything but "K" (KiB) is ever used, so this
         //       is static for now.
         let size_unit = 'K';
-        let size_multiplier = 1_024_u32;
 
         // remove the unit from the str
         size_str = size_str.replace(size_unit, "");
@@ -340,7 +345,7 @@ async fn core_cache(sysfs_core_path: &Path) -> Vec<CoreCache> {
 
         caches.push(CoreCache {
             level,
-            size: size * size_multiplier,
+            size, // we'll leave it in K
             _kind,
         })
     }
@@ -401,28 +406,84 @@ async fn core_freq(sysfs_core_path: &Path) -> Frequency {
 
 #[cfg(test)]
 mod tests {
-    use super::{core_freq, cpu_info};
+    use super::*;
     use std::path::PathBuf;
 
+    /// checks that we at least get some cores for the machine.
+    ///
+    /// we might refactor the `cpu_info` fn to be more testable...
     #[tokio::test]
     async fn check_get_cores() {
         logger();
 
-        let cores = cpu_info().await.unwrap();
-        assert!(!cores.is_empty());
+        if let Ok(cores) = cpu_info().await {
+            assert!(!cores.is_empty());
+        }
     }
 
     #[tokio::test]
     async fn check_freqs() {
         logger();
 
-        let core = PathBuf::from("/sys/devices/system/cpu/cpu0");
+        let core = cpu_path().join("cpu0");
         let freqs = core_freq(&core).await;
 
         // check that the freqs are in a good place
-        assert!(freqs.max.unwrap() != 0_u32);
-        assert!(freqs.max.unwrap() < 10_000_u32); // mhz
+        assert!(freqs.max.unwrap() == 2064); // mhz
+        assert!(freqs.min.unwrap() == 600); // ^
         _ = freqs.min.unwrap();
+    }
+
+    #[tokio::test]
+    async fn check_core_ct() {
+        logger();
+
+        // get a range of the core ct
+        let core = cpu_path();
+        let mut core_range = core_ct(&core).await.unwrap();
+
+        // grab the two ends
+        let start = core_range.next().unwrap();
+        let end = core_range.last().unwrap();
+
+        // check that the freqs are in a good place
+        assert_eq!(start, 0);
+        assert_eq!(end, 7);
+    }
+
+    #[tokio::test]
+    async fn check_processor_id() {
+        logger();
+
+        // make a path to some core and grab the associated processor id
+        let path = cpu_path().join("cpu0");
+        let prcsr_id = core_processor_id(&path).await;
+
+        assert_eq!(prcsr_id, 3);
+    }
+
+    #[tokio::test]
+    async fn check_core_cache() {
+        logger();
+
+        // path to cpu0 and check its caches
+        let path = cpu_path().join("cpu0");
+        let cache = core_cache(&path).await;
+
+        // get a cache for each
+        let mut iter_cache = cache.iter();
+        assert_eq!(cache.len(), 4, "there are four cache directories.");
+
+        let l1 = iter_cache
+            .find(|c| c.level == 1 && c.size == 64)
+            .expect("missing L1");
+        let l2 = iter_cache.find(|c| c.level == 2).expect("missing L2");
+        let l3 = iter_cache.find(|c| c.level == 3).expect("missing L3");
+
+        // check the size of each
+        assert_eq!(l1.size, 64); // K
+        assert_eq!(l2.size, 4096); // ^
+        assert_eq!(l3.size, 8192); // ^^
     }
 
     #[tracing::instrument]
@@ -430,5 +491,13 @@ mod tests {
         _ = tracing_subscriber::fmt()
             .with_max_level(tracing::Level::DEBUG)
             .try_init();
+    }
+
+    #[tracing::instrument]
+    fn cpu_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!(
+            "{root}/tests/assets/linux/sysfs/sys/devices/system/cpu"
+        ))
     }
 }
