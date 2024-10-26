@@ -35,4 +35,68 @@ impl Report {
             sys_conf: system_config::SystemConfInfo {},
         })
     }
+
+    /// Returns the CPUs attached to this report.
+    #[tracing::instrument(skip(self))]
+    pub fn cpus(&self) -> Vec<ComponentInfo> {
+        self.components
+            .clone()
+            .into_iter()
+            .flat_map(|cmp| {
+                if let ComponentDescription::CpuDescription(_) = &cmp.desc() {
+                    Some(cmp)
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
+    /// Returns the memory modules attached to this report.
+    #[tracing::instrument(skip(self))]
+    pub fn memory(&self) -> Vec<ComponentInfo> {
+        self.components
+            .clone()
+            .into_iter()
+            .flat_map(|cmp| {
+                if let ComponentDescription::RamDescription(_) = &cmp.desc() {
+                    Some(cmp)
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
+    /// Returns the GPUs attached to this report.
+    #[tracing::instrument(skip(self))]
+    pub fn gpus(&self) -> Vec<ComponentInfo> {
+        self.components
+            .clone()
+            .into_iter()
+            .flat_map(|cmp| {
+                if let ComponentDescription::GpuDescription(_) = &cmp.desc() {
+                    Some(cmp)
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
+    /// Returns the power supplies attached to this report.
+    #[tracing::instrument(skip(self))]
+    pub fn psus(&self) -> Vec<ComponentInfo> {
+        self.components
+            .clone()
+            .into_iter()
+            .flat_map(|cmp| {
+                if let ComponentDescription::PowerSupplyDescription(_) = &cmp.desc() {
+                    Some(cmp)
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
 }
