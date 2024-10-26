@@ -23,6 +23,7 @@ pub struct Report {
 }
 
 impl Report {
+    #[tracing::instrument]
     /// Attempts to assemble a new `Report`.
     pub async fn new() -> Result<Self, GhrError> {
         Ok(Self {

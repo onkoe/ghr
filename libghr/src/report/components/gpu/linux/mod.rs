@@ -10,6 +10,7 @@ mod amdgpu;
 mod generic;
 mod i915;
 
+#[tracing::instrument]
 pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
     // grab devices from the system
     let devices = devices().await?;
@@ -60,6 +61,7 @@ pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
     Ok(list)
 }
 
+#[tracing::instrument]
 /// gets the gpus on the system.
 ///
 /// do not export this!
@@ -92,6 +94,7 @@ async fn devices() -> GhrResult<Vec<DirEntry>> {
     Ok(gpus)
 }
 
+#[tracing::instrument(skip(device))]
 /// finds the driver for a device listing in `/sys/class/drm/cardN`.
 async fn find_driver(device: DirEntry) -> GhrResult<String> {
     // first, we want to navigate to the `device` folder

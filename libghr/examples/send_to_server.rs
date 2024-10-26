@@ -1,5 +1,6 @@
 use libghr::report::Report;
 
+#[tracing::instrument]
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     // add logging

@@ -32,6 +32,7 @@ pub struct MachineInfo {
 }
 
 impl MachineInfo {
+    #[tracing::instrument(skip(machine_id))]
     #[cfg(target_os = "linux")]
     pub async fn new(machine_id: MachineIdentifier) -> Self {
         use std::path::PathBuf;
@@ -79,6 +80,7 @@ impl MachineInfo {
         }
     }
 
+    #[tracing::instrument(skip(machine_id))]
     #[cfg(not(target_os = "linux"))]
     pub async fn new(machine_id: MachineIdentifier) -> Self {
         // system vendor + model
@@ -145,11 +147,13 @@ pub enum MachineIdentifier {
 }
 
 impl MachineIdentifier {
+    #[tracing::instrument]
     /// Computes a true identifier for this machine.
     pub fn new_true() -> GhrResult<Self> {
         Ok(Self::True(hash::make_hash()?))
     }
 
+    #[tracing::instrument]
     /// Creates a random identifier for this machine.
     pub fn new_random() -> Self {
         let s = rand::thread_rng()
@@ -162,6 +166,7 @@ impl MachineIdentifier {
 }
 
 impl Report {
+    #[tracing::instrument]
     #[cfg(target_os = "linux")]
     pub async fn machine_info() -> MachineInfoReturnType {
         Ok(MachineInfo::new(MachineIdentifier::new_true()?).await)

@@ -24,6 +24,7 @@ pub struct RamDescription {
     pub removable: Option<Removability>,
 }
 
+#[tracing::instrument]
 #[cfg(target_os = "linux")]
 pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
     use procfs::{Current, FromRead, Meminfo};
@@ -48,6 +49,7 @@ pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
     }])
 }
 
+#[tracing::instrument]
 #[cfg(target_os = "windows")]
 pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
     use std::collections::HashMap;

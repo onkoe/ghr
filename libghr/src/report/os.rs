@@ -9,6 +9,7 @@ use std::collections::BTreeMap;
 pub type OsInfoReturnType = GhrResult<OperatingSystemInfo>;
 
 impl Report {
+    #[tracing::instrument]
     /// Grabs operating system info for the hardware report.
     #[cfg(target_os = "linux")]
     pub(crate) fn os_info() -> OsInfoReturnType {
@@ -48,6 +49,7 @@ impl Report {
         })
     }
 
+    #[tracing::instrument]
     /// Grabs operating system info for the hardware report.
     #[cfg(target_os = "windows")]
     pub(crate) fn os_info() -> OsInfoReturnType {
@@ -92,16 +94,19 @@ pub struct OperatingSystemInfo {
 }
 
 impl OperatingSystemInfo {
+    #[tracing::instrument(skip(self))]
     /// Grabs the name of this operating system.
     pub fn name(&self) -> String {
         self.name.clone()
     }
 
+    #[tracing::instrument(skip(self))]
     /// Grabs the version of this operating system.
     pub fn version(&self) -> String {
         self.version.clone()
     }
 
+    #[tracing::instrument(skip(self))]
     /// This returns a list of stuff that comes from the operating system, but
     /// may be single-platform.
     ///

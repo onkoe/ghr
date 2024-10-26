@@ -47,6 +47,7 @@ pub enum Cache {
     L3 { size: u32, speed: Option<u32> },
 }
 
+#[tracing::instrument]
 /// Gets info about the CPU.
 pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
     #[cfg(target_os = "windows")]

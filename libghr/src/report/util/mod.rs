@@ -1,6 +1,7 @@
 #[cfg(target_os = "linux")]
 pub(crate) mod linux;
 
+#[tracing::instrument(skip(value))]
 /// converts a unit from units to mibiunits. for example, 1024 bytes becomes
 /// 1 KiB.
 pub(crate) fn unit_to_mibiunits(value: impl Into<u64>) -> u32 {

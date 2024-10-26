@@ -33,6 +33,7 @@ pub enum PowerSupplyDescription {
     Ac {},
 }
 
+#[tracing::instrument]
 pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     #[cfg(target_os = "linux")]
     return linux::get().await;

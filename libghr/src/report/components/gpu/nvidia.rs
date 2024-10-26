@@ -5,6 +5,7 @@ use tokio::task::JoinSet;
 
 use crate::prelude::internal::*;
 
+#[tracing::instrument]
 pub(crate) async fn get() -> GhrResult<Vec<ComponentInfo>> {
     // attempt to load the nvidia `nvml` library. this allows access to
     // the values of gpu specs + performance.
@@ -29,6 +30,7 @@ pub(crate) async fn get() -> GhrResult<Vec<ComponentInfo>> {
     })
 }
 
+#[tracing::instrument(skip(nvml))]
 /// iterates over each discovered devices, then returns any componentinfos
 /// found.
 async fn loop_on_devices(nvml: Nvml) -> Result<Vec<ComponentInfo>, NvmlError> {
@@ -56,6 +58,7 @@ async fn loop_on_devices(nvml: Nvml) -> Result<Vec<ComponentInfo>, NvmlError> {
     Ok(devices)
 }
 
+#[tracing::instrument(skip(nvml))]
 /// makes a `ComponentInfo` for the device, if applicable
 fn check_device(nvml: Arc<Nvml>, device_id: u32) -> Option<ComponentInfo> {
     // grab the device at the given index
@@ -120,6 +123,7 @@ trait TraceNvmlError<T> {
 }
 
 impl<T> TraceNvmlError<T> for Result<T, NvmlError> {
+    #[tracing::instrument(skip(self, id))]
     fn trace_ok(self, id: impl AsRef<str>, device_id: u32) -> Option<T> {
         match self {
             Ok(t) => Some(t),

@@ -7,6 +7,7 @@ pub mod psu;
 pub mod ram;
 pub mod usb;
 
+#[tracing::instrument]
 /// Grabs any known components (devices) on the system.
 ///
 /// Currently, this just supports USB and PCI. Additional device types will
@@ -52,6 +53,7 @@ pub struct ComponentInfo {
 }
 
 impl ComponentInfo {
+    #[tracing::instrument(skip(self))]
     /// Checks if a component is "blank" - meaning it has no fields filled out.
     ///
     /// In other words, if all of its fields are `None`.
@@ -135,6 +137,7 @@ mod linux {
     use tokio::fs::DirEntry;
     use tokio_stream::{wrappers::ReadDirStream, StreamExt};
 
+    #[tracing::instrument(skip(path))]
     pub(super) async fn devices(path: impl AsRef<Path>) -> GhrResult<Vec<DirEntry>> {
         let all_devices = tokio::fs::read_dir(path)
             .await
@@ -173,6 +176,7 @@ pub(crate) mod windows {
         }};
     }
 
+    #[tracing::instrument]
     pub(crate) fn get_wmi() -> GhrResult<WMIConnection> {
         // connect to the windows stuff
         let com_library = COM_LIBRARY.with(|com| com.clone())?;
@@ -187,6 +191,7 @@ pub(crate) mod windows {
         Ok(wmi_connection)
     }
 
+    #[tracing::instrument(skip(wmi))]
     /// grabs all "plug and play" devices on a windows computer
     pub(super) async fn get_pnp(wmi: WMIConnection) -> GhrResult<Vec<HashMap<String, Variant>>> {
         let query: Result<Vec<HashMap<String, Variant>>, _> =
@@ -201,6 +206,7 @@ pub(crate) mod windows {
         }
     }
 
+    #[tracing::instrument(skip(wmi))]
     /// checks for "pnp" devices with a prefix
     pub(super) async fn get_pnp_with_did_prefix(
         wmi: WMIConnection,
@@ -210,6 +216,7 @@ pub(crate) mod windows {
         pnp_filter_did_prefix(query?, prefix).await
     }
 
+    #[tracing::instrument(skip(query))]
     async fn pnp_filter_did_prefix(
         query: Vec<HashMap<String, Variant>>,
         did_prefix: &str,
@@ -268,6 +275,7 @@ pub(crate) mod windows {
     }
 
     impl VariantInto for Variant {
+        #[tracing::instrument(skip(self))]
         fn string_from_variant(&self) -> Option<String> {
             if let Variant::String(s) = self {
                 Some(s.clone())
@@ -276,6 +284,7 @@ pub(crate) mod windows {
             }
         }
 
+        #[tracing::instrument(skip(self))]
         fn u32_from_variant(&self) -> Option<u32> {
             if let Variant::UI4(u) = *self {
                 Some(u)
@@ -284,6 +293,7 @@ pub(crate) mod windows {
             }
         }
 
+        #[tracing::instrument(skip(self))]
         fn u64_from_variant(&self) -> Option<u64> {
             if let Variant::UI8(u) = *self {
                 Some(u)
@@ -292,6 +302,7 @@ pub(crate) mod windows {
             }
         }
 
+        #[tracing::instrument(skip(self))]
         fn bool_from_variant(&self) -> Option<bool> {
             if let Variant::Bool(b) = *self {
                 Some(b)
@@ -302,6 +313,7 @@ pub(crate) mod windows {
     }
 
     impl VariantInto for Option<&Variant> {
+        #[tracing::instrument(skip(self))]
         fn string_from_variant(&self) -> Option<String> {
             if let Some(Variant::String(s)) = self {
                 return Some(s.clone());
@@ -310,6 +322,7 @@ pub(crate) mod windows {
             None
         }
 
+        #[tracing::instrument(skip(self))]
         fn u32_from_variant(&self) -> Option<u32> {
             if let Some(Variant::UI4(u)) = self {
                 return Some(*u);
@@ -318,6 +331,7 @@ pub(crate) mod windows {
             None
         }
 
+        #[tracing::instrument(skip(self))]
         fn u64_from_variant(&self) -> Option<u64> {
             if let Some(Variant::UI8(u)) = self {
                 return Some(*u);
@@ -326,6 +340,7 @@ pub(crate) mod windows {
             None
         }
 
+        #[tracing::instrument(skip(self))]
         fn bool_from_variant(&self) -> Option<bool> {
             if let Some(Variant::Bool(b)) = self {
                 return Some(*b);

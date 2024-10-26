@@ -2,6 +2,7 @@
 
 use crate::prelude::internal::*;
 
+#[tracing::instrument]
 /// Gets a list of PCI devices on the system.
 pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     // grab info about pci devices and construct reprs
@@ -65,6 +66,7 @@ pub fn convert_to_pci_names(
     (id, vendor_id)
 }
 
+#[tracing::instrument(skip(class))]
 /// converts a given pci class identifier to a string.
 ///
 /// if it's not able to do so, returns the given value.

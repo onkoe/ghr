@@ -111,6 +111,7 @@ struct Core {
 }
 
 impl From<Core> for super::Core {
+    #[tracing::instrument(skip(value))]
     fn from(value: Core) -> Self {
         Self {
             cache: Some(
@@ -176,6 +177,7 @@ enum CacheKind {
     Unified,
 }
 
+#[tracing::instrument]
 /// grabs info about CPU cores, then returns a vector of them.
 ///
 /// # Errors
@@ -252,6 +254,7 @@ async fn core_ct(sysfs_cpu_path: &Path) -> Result<RangeInclusive<u32>, Box<dyn E
     Ok(first..=last)
 }
 
+#[tracing::instrument(skip(sysfs_core_path))]
 /// creates `CoreCache` structures (as many as needed for each entry).
 ///
 /// note that you'll need to combine these for totals across the CPU. also,
@@ -422,6 +425,7 @@ mod tests {
         _ = freqs.min.unwrap();
     }
 
+    #[tracing::instrument]
     fn logger() {
         _ = tracing_subscriber::fmt()
             .with_max_level(tracing::Level::DEBUG)

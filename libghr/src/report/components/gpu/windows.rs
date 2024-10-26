@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::{prelude::internal::*, report::components::gpu::GpuDescription};
 use wmi::Variant;
 
+#[tracing::instrument]
 /// grabs the system's gpus.
 pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
     // first, grab the wmi connection if we need it

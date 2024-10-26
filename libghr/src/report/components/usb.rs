@@ -9,6 +9,7 @@ use tokio::join;
 #[cfg(target_os = "linux")]
 use tokio::try_join;
 
+#[tracing::instrument]
 #[cfg(target_os = "linux")]
 pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
     // grab info about usb devices and construct reprs
@@ -137,6 +138,7 @@ async fn usb_vendor_and_id(path: &Path) -> (Option<String>, Option<String>) {
     (None, None)
 }
 
+#[tracing::instrument]
 #[cfg(target_os = "windows")]
 pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
     use super::windows::get_pnp_with_did_prefix;

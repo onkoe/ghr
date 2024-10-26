@@ -23,6 +23,7 @@ pub struct GpuDescription {
     video_memory_speed: Option<u32>,
 }
 
+#[tracing::instrument]
 /// Gets information about the system's GPU(s).
 pub async fn gpu() -> GhrResult<Vec<ComponentInfo>> {
     let mut gpus = Vec::new();

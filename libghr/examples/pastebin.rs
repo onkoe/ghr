@@ -20,6 +20,7 @@ struct Args {
     upload: bool,
 }
 
+#[tracing::instrument]
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     // add logging

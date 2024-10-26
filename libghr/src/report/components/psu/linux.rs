@@ -42,6 +42,7 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     Ok(psus)
 }
 
+#[tracing::instrument(skip(kind, path))]
 /// matches on the type of power supply this device is and runs the appropriate
 /// function
 async fn psu_info(kind: &str, path: &Path) -> Option<PowerSupplyDescription> {
@@ -51,6 +52,7 @@ async fn psu_info(kind: &str, path: &Path) -> Option<PowerSupplyDescription> {
     }
 }
 
+#[tracing::instrument(skip(path))]
 /// finds info about a battery
 async fn battery_info(path: &Path) -> Option<PowerSupplyDescription> {
     // this is a lot of stuff but it's fine
@@ -107,6 +109,7 @@ async fn battery_info(path: &Path) -> Option<PowerSupplyDescription> {
     })
 }
 
+#[tracing::instrument(skip(uwh))]
 /// converts microwatt-hours to watt-hours
 fn uwh_to_wh(uwh: u64) -> f64 {
     (uwh as f64) / 1_000_000_f64

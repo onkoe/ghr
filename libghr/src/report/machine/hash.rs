@@ -8,6 +8,7 @@ use argon2::{password_hash::SaltString, Argon2, PasswordHasher as _};
 
 pub type Hash = Vec<u8>;
 
+#[tracing::instrument]
 /// Creates a hash from the system MAC address as the password, and various
 /// other static identifiers as pieces of the salt.
 pub(crate) fn make_hash() -> GhrResult<Hash> {
@@ -31,6 +32,7 @@ pub(crate) fn make_hash() -> GhrResult<Hash> {
     Ok(hash.as_bytes().to_vec())
 }
 
+#[tracing::instrument]
 /// Grabs the system's mac address, hashed and salted with a static string,
 /// and trimmed to 32 bytes, which is repeated three times.
 fn mac_addr() -> GhrResult<Hash> {
@@ -44,6 +46,7 @@ fn mac_addr() -> GhrResult<Hash> {
         .map(|addr| addr.bytes().to_vec())
 }
 
+#[tracing::instrument]
 /// Grabs some unique identifiers from system sources, used to make a salt.
 ///
 /// These are truncated to avoid being identifiable.

@@ -6,12 +6,13 @@ use libghr::report::Report;
 use tokio::io::AsyncWriteExt;
 use tracing::Level;
 
+#[tracing::instrument]
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     // turn on logging
     tracing_subscriber::fmt()
         .pretty()
-        .with_max_level(Level::WARN)
+        .with_max_level(Level::DEBUG)
         .init();
 
     // make the report
