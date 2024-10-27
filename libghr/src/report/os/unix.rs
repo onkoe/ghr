@@ -1,5 +1,6 @@
 use crate::prelude::internal::*;
 
+use std::collections::BTreeMap;
 use std::path::Path;
 
 impl Report {
@@ -7,8 +8,6 @@ impl Report {
     #[tracing::instrument]
     pub(crate) async fn os_info() -> GhrResult<OperatingSystemInfo> {
         // we're on a Unix, so let's grab `utsname`
-
-        use std::collections::BTreeMap;
         let uname = match nix::sys::utsname::uname() {
             Ok(uts) => uts,
             Err(e) => return Err(GhrError::OsInfoInaccessible(e.to_string())),

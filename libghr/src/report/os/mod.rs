@@ -34,6 +34,14 @@ impl OperatingSystemInfo {
         self.name.clone()
     }
 
+    /// Grabs the distro name of this operating system.
+    ///
+    /// ex: `Fedora Linux 40 (Forty)`
+    #[tracing::instrument(skip(self))]
+    pub fn distro_name(&self) -> Option<String> {
+        self.distro_name.clone()
+    }
+
     /// Grabs the version of this operating system.
     ///
     /// ex on Linux: `6.11.3-200.fc40.x86_64`
