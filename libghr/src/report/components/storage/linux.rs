@@ -257,8 +257,104 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn todo_test() {
+    async fn check_general_info() {
         logger();
-        todo!()
+        let path = ssd_path();
+
+        // get all info
+        let info = one(path).await.unwrap();
+
+        // check name, vendor
+        assert_eq!(info.id.unwrap(), "Samsung SSD 860");
+        assert_eq!(info.vendor_id.unwrap(), "ATA");
+    }
+
+    #[tokio::test]
+    async fn check_specialized_info() {
+        logger();
+        let path = ssd_path();
+
+        // get all info
+        let info = one(path).await.unwrap();
+
+        // ensure we've got a drive
+        let ComponentDescription::StorageDescription(desc) = info.desc() else {
+            panic!("wrong desc ty!");
+        };
+
+        // do checks
+        //
+        // removed til' i can simulate symlinks
+        // assert_eq!(desc.connector.unwrap(), StorageConnector::Sata);
+        //
+        assert_eq!(desc.is_removable, Some(false));
+        assert_eq!(desc.kind.unwrap(), StorageKind::Ssd);
+        assert!(desc.speed.is_none());
+        assert_eq!(
+            desc.usage.total_capacity.unwrap(),
+            (512 * 1953525168) / 1024
+        );
+    }
+
+    #[tokio::test]
+    async fn check_connector() {
+        logger();
+
+        let _a = connector("/home/farts/sys/class/scsi_disk/15:0:0:0/")
+            .await
+            .unwrap();
+        let _b = connector("/sys/class/ata_port/1:0:0:0/").await.unwrap();
+        let _c = connector("/sys/class/scsi_disk/any_name_will_do")
+            .await
+            .unwrap();
+        let _d = connector("/home/sys/class/real_sysroot/sys/class/scsi_disk/15:0:0:0/")
+            .await
+            .unwrap();
+
+        assert_eq!(_a, StorageConnector::Scsi);
+        assert_eq!(_b, StorageConnector::Sata);
+        assert_eq!(_c, StorageConnector::Scsi);
+        assert_eq!(_d, StorageConnector::Scsi);
+    }
+
+    #[tokio::test]
+    async fn check_capacity() {
+        logger();
+        let path = ssd_path();
+
+        // ensure it's converting to KiB correctly
+        let cap = capacity(path).await.unwrap();
+        assert_eq!(cap, ((512 * 1953525168) / 1024));
+
+        // check in GiB, too
+        let cap_gib = cap as f64 / 1024_f64.powf(2.0);
+        assert!(almost::equal(cap_gib, 931.51339))
+    }
+
+    #[tokio::test]
+    async fn check_speed() {
+        logger();
+        let ComponentDescription::StorageDescription(desc) = one(hdd_path()).await.unwrap().desc()
+        else {
+            panic!("wrong desc ty!");
+        };
+
+        // speed is set to 7200 rpm.
+        assert_eq!(desc.speed.unwrap(), 7200);
+    }
+
+    #[tracing::instrument]
+    fn ssd_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!(
+            "{root}/tests/assets/linux/sysfs/sys/class/block/sda"
+        ))
+    }
+
+    fn hdd_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!(
+            "{root}/tests/assets/linux/sysfs/sys/class/block/sdb"
+        ))
     }
 }
