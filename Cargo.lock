@@ -1348,6 +1348,7 @@ dependencies = [
  "base64",
  "chrono",
  "clap",
+ "futures",
  "mac_address",
  "nix 0.29.0",
  "nvml-wrapper",
