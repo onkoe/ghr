@@ -7,6 +7,9 @@ pub(crate) mod internal {
             components::gpu::GpuDescription,
             components::psu::PowerSupplyDescription,
             components::ram::RamDescription,
+            components::storage::{
+                StorageConnector, StorageDescription, StorageKind, StorageUsage,
+            },
             components::{
                 ComponentBus, ComponentDescription, ComponentInfo, ComponentStatus, Removability,
             },
