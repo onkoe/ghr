@@ -5,6 +5,7 @@ pub mod gpu;
 pub mod pci;
 pub mod psu;
 pub mod ram;
+pub mod storage;
 pub mod usb;
 
 #[tracing::instrument]
