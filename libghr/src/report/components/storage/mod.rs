@@ -62,7 +62,13 @@ pub enum StorageConnector {
 
 /// Grabs storage devices from the system.
 #[tracing::instrument]
-pub fn get() -> GhrResult<Vec<ComponentInfo>> {
-    tracing::error!("unimplemented.");
-    Ok(Vec::new())
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
+    #[cfg(target_os = "linux")]
+    return linux::get().await;
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        tracing::error!("unimplemented.");
+        Ok(Vec::new())
+    }
 }
