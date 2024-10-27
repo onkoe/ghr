@@ -4,6 +4,8 @@ use crate::prelude::internal::*;
 
 #[tracing::instrument]
 pub(super) async fn gpu(gpu: &Path) -> GhrResult<ComponentInfo> {
+    let gpu = gpu.join("device");
+
     // grab some id info about the gpu
     let (id, vendor_id, class) = tokio::join! {
         sysfs_value_opt::<String>(gpu.join("device")),
@@ -17,13 +19,11 @@ pub(super) async fn gpu(gpu: &Path) -> GhrResult<ComponentInfo> {
         convert_to_pci_names(id, vendor_id),
     );
 
-    println!("path: {gpu:#?}");
-
     // and now some device info
     let (video_memory, clock_speed, video_memory_speed) = tokio::join! {
         sysfs_value_opt::<u64>(gpu.join("mem_info_vram_total")),
-        gpu_clock(gpu),
-        gpu_mem_clock(gpu)
+        gpu_clock(&gpu),
+        gpu_mem_clock(&gpu)
     };
 
     // map units to mibiunits
@@ -66,7 +66,6 @@ async fn gpu_mem_clock(gpu: &Path) -> Option<u32> {
 #[tracing::instrument]
 async fn clock<S: AsRef<str> + std::fmt::Debug>(gpu: &Path, file: S) -> Option<u32> {
     let file = file.as_ref();
-    println!("in clock: {}, {file}", gpu.display());
 
     let Some(clk_string) = sysfs_value_opt::<String>(gpu.join(file)).await else {
         tracing::warn!("The `{file}` file does not exist for the given GPU.");
@@ -178,7 +177,7 @@ mod tests {
         logger();
 
         let path = amdgpu_path();
-        let clk = gpu_clock(&path).await.unwrap();
+        let clk = gpu_clock(&path.join("device")).await.unwrap();
 
         assert_eq!(clk, 2880, "clock speed func");
     }
@@ -188,7 +187,7 @@ mod tests {
         logger();
 
         let path = amdgpu_path();
-        let clk = gpu_mem_clock(&path).await.unwrap();
+        let clk = gpu_mem_clock(&path.join("device")).await.unwrap();
 
         assert_eq!(clk, 1124, "mem speed func");
     }
@@ -197,7 +196,7 @@ mod tests {
     fn amdgpu_path() -> PathBuf {
         let root = env!("CARGO_MANIFEST_DIR");
         PathBuf::from(format!(
-            "{root}/tests/assets/linux/sysfs/sys/class/drm/card1/device"
+            "{root}/tests/assets/linux/sysfs/sys/class/drm/card1"
         ))
     }
 }

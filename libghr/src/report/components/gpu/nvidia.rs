@@ -118,6 +118,7 @@ fn check_device(nvml: Arc<Nvml>, device_id: u32) -> Option<ComponentInfo> {
     })
 }
 
+#[allow(dead_code)] // it aint dead on windows. yet.
 trait TraceNvmlError<T> {
     fn trace_ok(self, id: impl AsRef<str>, device_id: u32) -> Option<T>;
 }

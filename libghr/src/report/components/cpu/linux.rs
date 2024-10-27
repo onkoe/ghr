@@ -473,11 +473,6 @@ mod tests {
         // get a cache for each
         assert_eq!(cache.len(), 4, "there are four cache directories.");
 
-        // let's print the cache level for each!
-        for (i, c) in cache.iter().enumerate() {
-            eprintln!("cache {i}: level {}", c.level);
-        }
-
         let l1 = cache
             .iter()
             .find(|c| c.level == 1 && c.size == 64)

@@ -31,7 +31,7 @@ pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
 
         // based on the driver, pick an implementation to use
         tracing::debug!("parsing gpu with `{driver}` driver at `{path_str}`...",);
-        let info = match driver.to_ascii_lowercase().as_str() {
+        let info: Result<ComponentInfo, GhrError> = match driver.to_ascii_lowercase().as_str() {
             "amdgpu" => amdgpu::gpu(&path).await,
             "i915" => i915::gpu(&path).await,
             "nvidia" => {
