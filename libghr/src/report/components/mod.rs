@@ -119,12 +119,13 @@ pub enum ComponentBus {
     Fpci,
     Agp,
 
-    // mostly hard drive stuff
+    // mostly storage stuff
     Nvme,
     Scsi,
     Ide,
 
     Other(String),
+    Unknown,
 }
 
 /// Information about the health of the component.
@@ -152,6 +153,9 @@ pub enum ComponentDescription {
 
     /// Describes a power supply, like a battery or AC adapter.
     PowerSupplyDescription(PowerSupplyDescription),
+
+    /// About some storage device.
+    StorageDescription(StorageDescription),
 
     /// No description is available for this device.
     None,

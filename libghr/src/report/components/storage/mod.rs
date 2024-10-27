@@ -11,7 +11,7 @@ pub struct StorageDescription {
     pub kind: Option<StorageKind>,
 
     /// Information about the disk's usage and capacity.
-    pub usage: Option<StorageUsage>,
+    pub usage: StorageUsage,
 
     /// The rotation speed of the drive, if applicable, in RPM.
     pub speed: Option<u32>,
@@ -20,7 +20,7 @@ pub struct StorageDescription {
     pub connector: Option<StorageConnector>,
 
     /// Whether or not the drive is known to be removable.
-    pub is_removable: bool,
+    pub is_removable: Option<bool>,
 }
 
 /// A "kind" describing a storage device.
@@ -41,10 +41,10 @@ pub enum StorageKind {
 #[non_exhaustive]
 pub struct StorageUsage {
     /// The amount of storage capacity used, in KiB.
-    pub usage: u64,
+    pub usage: Option<u64>,
 
     /// The total storage capacity the device has available, in KiB.
-    pub total_capacity: u64,
+    pub total_capacity: Option<u64>,
 }
 
 /// A storage device's connector.
@@ -56,9 +56,11 @@ pub enum StorageConnector {
     /// "M.2" (NGFF): https://en.wikipedia.org/wiki/M.2
     M2,
     Pcie,
+    Scsi,
     Other(String),
 }
 
+/// Grabs storage devices from the system.
 #[tracing::instrument]
 pub fn get() -> GhrResult<Vec<ComponentInfo>> {
     tracing::error!("unimplemented.");
