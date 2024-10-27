@@ -107,30 +107,6 @@ jobs:
               with:
                   toolchain: ${{ matrix.toolchain }}
 
-            - name: Cache cargo registry
-              uses: actions/cache@v3
-              with:
-                  path: ~/.cargo/registry
-                  key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-
-            - name: Cache cargo index
-              uses: actions/cache@v3
-              with:
-                  path: ~/.cargo/git
-                  key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-
-            - name: Cache cargo build
-              uses: actions/cache@v3
-              with:
-                  path: target
-                  key: ${{ runner.os }}-cargo-build-target-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
-
-            - name: Cache cargo bin # bc wow why does it take three minutes to build `cargo-deny`
-              uses: actions/cache@v3
-              with:
-                  path: ~/.cargo/bin
-                  key: ${{ runner.os }}-cargo-bin-${{ hashFiles('**/Cargo.lock') }}
-
             - name: Build
               run: cargo build
 
