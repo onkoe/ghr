@@ -14,13 +14,13 @@ mod nvidia;
 #[non_exhaustive]
 pub struct GpuDescription {
     /// Clock speed, in MHz.
-    clock_speed: Option<u32>,
+    pub clock_speed: Option<u32>,
 
     /// Available video memory, in MiB.
-    video_memory: Option<u32>,
+    pub video_memory: Option<u32>,
 
     /// Video memory clock speed, in MHz.
-    video_memory_speed: Option<u32>,
+    pub video_memory_speed: Option<u32>,
 }
 
 #[tracing::instrument]
