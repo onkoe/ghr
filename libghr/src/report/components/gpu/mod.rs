@@ -29,7 +29,7 @@ pub async fn gpu() -> GhrResult<Vec<ComponentInfo>> {
     let mut gpus = Vec::new();
 
     // only run if the platform has nvidia
-    #[cfg(any(target_os = "linux", target_os = "windows"))]
+    #[cfg(target_os = "windows")]
     if let Ok(mut nvidia_gpus) = nvidia::get().await {
         gpus.append(&mut nvidia_gpus);
     }
