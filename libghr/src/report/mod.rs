@@ -105,4 +105,20 @@ impl Report {
             })
             .collect()
     }
+
+    /// Returns any storage devices attached to this report.
+    #[tracing::instrument(skip(self))]
+    pub fn storage(&self) -> Vec<ComponentInfo> {
+        self.components
+            .clone()
+            .into_iter()
+            .flat_map(|cmp| {
+                if let ComponentDescription::StorageDescription(_) = &cmp.desc() {
+                    Some(cmp)
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
 }
