@@ -2,7 +2,10 @@ name: ci (rust + web)
 
 on:
     push:
+      branches:
+        - "main"
     pull_request:
+      types: ["opened", "reopened"]
 
 env:
     CARGO_TERM_COLOR: always
