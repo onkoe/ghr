@@ -44,3 +44,38 @@ where
 {
     sysfs_value::<V>(path).await.ok()
 }
+
+/// class, id, vendor
+///
+/// (assumes that the given device is pci or uses pci values)
+pub(crate) struct Civ {
+    pub(crate) class: Option<String>,
+    pub(crate) vendor: Option<String>,
+    pub(crate) id: Option<String>,
+}
+
+impl Civ {
+    /// grabs the `sysfs` device's pci class/vendor_id/id.
+    ///
+    /// this path MUST be a `sysfs` entry, like `/sys/class/<class>/<device>`.
+    /// do not use other paths.
+    #[tracing::instrument]
+    pub(crate) async fn new<P: AsRef<Path> + std::fmt::Debug>(path: P) -> Self {
+        let path = path.as_ref().join("device/");
+
+        // read all three values
+        let (class, id, vendor) = tokio::join! {
+            sysfs_value_opt::<String>(path.join("class")),
+            sysfs_value_opt::<String>(path.join("device")),
+            sysfs_value_opt::<String>(path.join("vendor")),
+        };
+
+        let (class, (id, vendor)) = (
+            convert_to_pci_class(class),
+            convert_to_pci_names(id, vendor),
+        );
+
+        Self { class, vendor, id }
+    }
+}
+
