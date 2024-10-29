@@ -20,6 +20,10 @@ pub(super) async fn gpu(path: &Path) -> GhrResult<ComponentInfo> {
         class,
         vendor_id,
         status: None,
-        desc: ComponentDescription::None,
+        desc: ComponentDescription::GpuDescription(GpuDescription {
+            clock_speed: None,
+            video_memory: None,
+            video_memory_speed: None,
+        }),
     })
 }
