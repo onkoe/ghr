@@ -377,6 +377,11 @@ pub(crate) mod windows {
                 return Some(*u);
             }
 
+            // also attempt to get a u64 and cast it
+            if let Some(Variant::UI8(u)) = self {
+                return Some(*u as u32);
+            }
+
             None
         }
 
