@@ -79,3 +79,47 @@ impl Civ {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::Civ;
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn get_amdgpu_civ() {
+        let amdgpu_path = amdgpu_path();
+
+        // make a civ
+        let civ = Civ::new(amdgpu_path).await;
+
+        // make sure values align. copy-and-pasted from `amdgpu.rs`
+
+        // class
+        assert_eq!(
+            "Display controller (VGA compatible controller)",
+            civ.class.unwrap(),
+            "device class"
+        );
+
+        // vendor
+        assert_eq!(
+            "Advanced Micro Devices, Inc. [AMD/ATI]",
+            civ.vendor.unwrap(),
+            "device vendor"
+        );
+
+        // device
+        assert_eq!(
+            "Navi 22 [Radeon RX 6700/6700 XT/6750 XT / 6800M]",
+            civ.id.unwrap(),
+            "device name"
+        );
+    }
+
+    #[tracing::instrument]
+    fn amdgpu_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!(
+            "{root}/tests/assets/linux/sysfs/sys/class/drm/card1"
+        ))
+    }
+}
