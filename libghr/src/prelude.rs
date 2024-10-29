@@ -32,7 +32,7 @@ pub(crate) mod internal {
         convert_to_pci_class, convert_to_pci_names,
     };
     #[cfg(target_os = "linux")]
-    pub(crate) use crate::report::util::linux::{sysfs_value, sysfs_value_opt};
+    pub(crate) use crate::report::util::linux::{sysfs_value, sysfs_value_opt, Civ};
 
     // export logger creating fn for unit tests
     #[cfg(test)]
