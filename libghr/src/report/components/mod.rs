@@ -2,6 +2,7 @@ use crate::prelude::internal::*;
 
 pub mod cpu;
 pub mod gpu;
+pub mod nic;
 pub mod pci;
 pub mod psu;
 pub mod ram;
