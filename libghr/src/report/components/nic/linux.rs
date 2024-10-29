@@ -71,3 +71,39 @@ async fn one<P: AsRef<Path> + std::fmt::Debug>(path: P) -> Option<ComponentInfo>
         }),
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn check_nic_linux() {
+        // get the path of the card
+        let wifi_path = wifi_path();
+
+        // give it to the func
+        let info = one(wifi_path).await.unwrap();
+
+        // check name + vendor
+        assert_eq!(info.vendor_id().unwrap(), "Intel Corporation");
+        assert_eq!(info.id().unwrap(), "Wi-Fi 6 AX210/AX211/AX411 160MHz");
+
+        // grab adapter details
+        let ComponentDescription::NicDescription(desc) = info.desc else {
+            panic!("wrong desc");
+        };
+
+        // check speed, mtus
+        assert_eq!(desc.max_speed, Some(1_000));
+        assert_eq!(desc.mtu, Some(2_800));
+    }
+
+    #[tracing::instrument]
+    fn wifi_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!(
+            "{root}/tests/assets/linux/sysfs/sys/class/net/wlo1"
+        ))
+    }
+}
