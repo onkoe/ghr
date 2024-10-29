@@ -70,4 +70,41 @@ async fn from_wmi_query(query: Vec<HashMap<String, Variant>>) -> Vec<ComponentIn
 
     cpus
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn check_amd_cpu_windows() {
+        // grab the cpu
+        let query = amd_cpu_query().await;
+
+        let cpu_list = from_wmi_query(query).await;
+        let cpu = cpu_list.first().unwrap();
+
+        // ensure it's got the right name + vendor
+        assert_eq!(cpu.id().unwrap(), "AMD Ryzen 7 5800X 8-Core Processor");
+        assert_eq!(cpu.vendor_id().unwrap(), "AuthenticAMD");
+
+        // grab specific info
+        let ComponentDescription::CpuDescription(desc) = cpu.desc() else {
+            panic!("wrong desc");
+        };
+
+        // check specific cpu info
+        assert_eq!(desc.core_ct.unwrap(), 8);
+        assert_eq!(desc.clock_speed.max.unwrap(), 3801);
+    }
+
+    #[tracing::instrument]
+    async fn amd_cpu_query() -> Vec<HashMap<String, Variant>> {
+        let root = env!("CARGO_MANIFEST_DIR");
+        let path = PathBuf::from(format!("{root}/tests/assets/windows/cpu.json"));
+
+        // load the query
+        serde_json::from_str(&tokio::fs::read_to_string(path).await.unwrap()).unwrap()
+    }
 }
