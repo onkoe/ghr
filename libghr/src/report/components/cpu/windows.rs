@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use wmi::Variant;
+
 use crate::prelude::internal::*;
 
 #[tracing::instrument]
@@ -24,6 +28,12 @@ pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
     };
 
     // make it into real info
+    Ok(from_wmi_query(query).await)
+}
+
+/// takes a wmi query and searches for any cpus it contains.
+#[tracing::instrument(skip(query))]
+async fn from_wmi_query(query: Vec<HashMap<String, Variant>>) -> Vec<ComponentInfo> {
     let mut cpus = Vec::new();
     for cpu in query {
         let name = cpu
@@ -56,8 +66,8 @@ pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
             }),
         })
     }
-
     tracing::debug!("found {} CPUs!", cpus.len());
 
-    Ok(cpus)
+    cpus
+}
 }
