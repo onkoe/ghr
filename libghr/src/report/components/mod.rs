@@ -1,3 +1,5 @@
+use futures::{stream::FuturesUnordered, FutureExt as _, StreamExt};
+
 use crate::prelude::internal::*;
 
 pub mod cpu;
@@ -11,22 +13,27 @@ pub mod usb;
 
 #[tracing::instrument]
 /// Grabs any known components (devices) on the system.
-///
-/// Currently, this just supports USB and PCI. Additional device types will
-/// come soon!
 pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
-    let (cpu, usb, pci, ram, gpus, psus, storage, nics) = tokio::try_join! {
-        cpu::cpu(),
-        usb::usb_components(),
-        pci::get(),
-        ram::ram(),
-        gpu::gpu(),
-        psu::get(),
-        storage::get(),
-        nic::get(),
-    }?;
+    let mut futures = FuturesUnordered::new();
 
-    Ok([cpu, usb, pci, ram, gpus, psus, storage, nics]
+    // add components to the set. this prevents a stack overflow on a shared
+    // await point!
+    futures.push(cpu::cpu().boxed_local());
+    futures.push(usb::usb_components().boxed_local());
+    futures.push(pci::get().boxed_local());
+    futures.push(ram::ram().boxed_local());
+    futures.push(gpu::gpu().boxed_local());
+    futures.push(psu::get().boxed_local());
+    futures.push(storage::get().boxed_local());
+    futures.push(nic::get().boxed_local());
+
+    // iterate over each future in the stream.
+    let mut components = Vec::new();
+    while let Some(comp) = futures.next().await {
+        components.push(comp?);
+    }
+
+    Ok(components
         .into_iter()
         .flatten()
         .filter(|c: &ComponentInfo| !c.is_blank())
