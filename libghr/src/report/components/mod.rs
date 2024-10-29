@@ -159,6 +159,9 @@ pub enum ComponentDescription {
     /// About some storage device.
     StorageDescription(StorageDescription),
 
+    /// About a network interface device.
+    NicDescription(NicDescription),
+
     /// No description is available for this device.
     None,
 }
