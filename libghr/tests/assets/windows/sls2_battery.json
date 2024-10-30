@@ -1,0 +1,39 @@
+[
+    {
+        "TimeOnBattery": null,
+        "Availability": 3,
+        "InstallDate": null,
+        "SystemName": "nope",
+        "DesignVoltage": 11727,
+        "BatteryStatus": 1,
+        "FullChargeCapacity": 49500,
+        "ExpectedLife": null,
+        "Description": "Internal Battery",
+        "ErrorDescription": null,
+        "BatteryRechargeTime": null,
+        "EstimatedRunTime": 180,
+        "LastErrorCode": null,
+        "DesignCapacity": 50000,
+        "MaxRechargeTime": null,
+        "PNPDeviceID": null,
+        "TimeToFullCharge": null,
+        "ErrorCleared": null,
+        "SystemCreationClassName": "Win32_ComputerSystem",
+        "Status": "OK",
+        "ConfigManagerErrorCode": null,
+        "DeviceID": "SurfaceBattery1",
+        "CreationClassName": "Win32_Battery",
+        "StatusInfo": null,
+        "EstimatedChargeRemaining": 67,
+        "Name": "SurfaceBattery",
+        "ExpectedBatteryLife": null,
+        "PowerManagementCapabilities": [
+            1
+        ],
+        "ConfigManagerUserConfig": null,
+        "PowerManagementSupported": false,
+        "SmartBatteryVersion": null,
+        "Caption": "Internal Battery",
+        "Chemistry": 6
+    }
+]
