@@ -1,6 +1,14 @@
+set windows-shell := ["C:\\Program Files\\Git\\bin\\sh.exe","-c"] 
+
+# runs cargo check for windows and linux (x86_64).
+#
+# assumes targets are installed.
+check:
+    cargo check --target x86_64-pc-windows-msvc
+    cargo check --target x86_64-unknown-linux-gnu
 
 # attempts to `cargo check` for all supported targets
-check: _install_targets
+check_all: _install_targets
     cargo check --target x86_64-pc-windows-msvc
     cargo check --target x86_64-unknown-linux-musl
     cargo check --target i686-pc-windows-msvc
