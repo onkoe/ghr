@@ -3,6 +3,9 @@ use crate::prelude::internal::*;
 #[cfg(target_os = "linux")]
 mod linux;
 
+#[cfg(target_os = "windows")]
+mod windows;
+
 /// A description of a storage device.
 #[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
