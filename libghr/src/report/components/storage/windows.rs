@@ -96,8 +96,9 @@ mod tests {
             panic!("wrong desc");
         };
 
-        // check the capacity
+        // check the capacity + that it isnt removable
         assert_eq!(desc.usage.total_capacity.unwrap(), 500103450);
+        assert!(!desc.is_removable.unwrap())
     }
 
     #[tracing::instrument]

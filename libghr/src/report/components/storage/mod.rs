@@ -69,9 +69,6 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     #[cfg(target_os = "linux")]
     return linux::get().await;
 
-    #[cfg(not(target_os = "linux"))]
-    {
-        tracing::error!("unimplemented.");
-        Ok(Vec::new())
-    }
+    #[cfg(target_os = "windows")]
+    return windows::get().await;
 }
