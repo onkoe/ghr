@@ -4,3 +4,8 @@ libghr/ghr.json
 /shared/bindings
 frontend/.vscode/settings.json
 **/.secrets
+
+# don't include generated json reports
+**/ghr-**/ghr.json
+**/ghr-**/ghr.pretty.json
+**/ghr-**.7z
