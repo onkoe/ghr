@@ -12,13 +12,13 @@ fn main() {
 
     // put ur query here
     let query: Vec<HashMap<String, Variant>> =
-        wmi.raw_query("SELECT * from Win32_NetworkAdapter").unwrap();
+        wmi.raw_query("SELECT * from Win32_Battery").unwrap();
     let stringd = serde_json::to_string(&query).unwrap();
 
     println!("{}", stringd);
 
     // save the query to a file
-    let save_path = PathBuf::from("network_interfaces.json");
+    let save_path = PathBuf::from("libghr/tests/assets/windows/sls2_battery.json");
     let mut file = std::fs::File::create(save_path).unwrap();
     file.write_all(stringd.as_bytes()).unwrap();
 }

@@ -76,5 +76,46 @@ async fn one(fields: HashMap<String, Variant>) -> ComponentInfo {
             cycle_count: None,
         }),
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn check_sls2_battery() {
+        let path = sls2_battery_path();
+        let query = serde_json::from_str(&tokio::fs::read_to_string(path).await.unwrap()).unwrap();
+
+        let batteries = all(query).await;
+        let cmp = batteries.first().unwrap();
+
+        // name and vendor
+        assert_eq!(cmp.id().unwrap(), "SurfaceBattery");
+        assert!(cmp.vendor_id().is_none());
+
+        // we should have a matching description
+        let ComponentDescription::PowerSupplyDescription(PowerSupplyDescription::Battery {
+            technology,
+            real_capacity_wh,
+            theoretical_capacity_wh,
+            cycle_count,
+        }) = cmp.desc()
+        else {
+            panic!("wrong one!");
+        };
+
+        // check desc attributes
+        assert_eq!(technology.unwrap(), "Lithium-ion");
+        assert!(almost::equal(real_capacity_wh.unwrap(), 49.5));
+        assert!(almost::equal(theoretical_capacity_wh.unwrap(), 50.0));
+        assert!(cycle_count.is_none()); // windows doesn't seem to support this
+    }
+
+    #[tracing::instrument]
+    fn sls2_battery_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(root).join("tests/assets/windows/sls2_battery.json")
     }
 }
