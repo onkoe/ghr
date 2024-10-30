@@ -73,3 +73,37 @@ async fn one(device: HashMap<String, Variant>) -> Option<ComponentInfo> {
         desc,
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn check_general_info() {
+        logger();
+
+        // get all info
+        let query = sls2_battery_query().await;
+        let all_info = all(query).await;
+        let info = all_info.first().unwrap();
+
+        // check name, vendor
+        assert_eq!(info.id().unwrap(), "SAMSUNG MZ9LQ512HALU-00000");
+        assert_eq!(info.vendor_id().unwrap(), "(Standard disk drives)"); // weird, but sure
+
+        let ComponentDescription::StorageDescription(desc) = info.desc() else {
+            panic!("wrong desc");
+        };
+
+        // check the capacity
+        assert_eq!(desc.usage.total_capacity.unwrap(), 500103450);
+    }
+
+    #[tracing::instrument]
+    async fn sls2_battery_query() -> Vec<HashMap<String, Variant>> {
+        let root = env!("CARGO_MANIFEST_DIR");
+        let path = PathBuf::from(root).join("tests/assets/windows/sls2_nvme_storage.json");
+        serde_json::from_str(&tokio::fs::read_to_string(path).await.unwrap()).unwrap()
+    }
+}
