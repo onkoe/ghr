@@ -384,8 +384,18 @@ pub(crate) mod windows {
                 return Some(*u);
             }
 
-            // also attempt to get a u64 and cast it
+            // also attempt to get a u64 and cast it.
+            // note that this can truncate, but isn't expected to do so outside of tests.
             if let Some(Variant::UI8(u)) = self {
+                #[cfg(not(test))]
+                tracing::warn!(
+                    "Casting `u64` to `u32` outside of tests. This may truncate the value!"
+                );
+                return Some(*u as u32);
+            }
+
+            // or a u16. this is a safe cast on all supported platforms.
+            if let Some(Variant::UI2(u)) = self {
                 return Some(*u as u32);
             }
 
