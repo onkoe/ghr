@@ -72,4 +72,36 @@ async fn one(fields: HashMap<String, Variant>) -> Option<ComponentInfo> {
         }),
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn check_windows_ax200_wireless() {
+        let path = ax200_path();
+        let query = serde_json::from_str(&tokio::fs::read_to_string(path).await.unwrap()).unwrap();
+
+        let nics = all(query).await;
+        let cmp = nics.first().unwrap();
+
+        // name and vendor
+        assert_eq!(cmp.id().unwrap(), "Intel(R) Wi-Fi 6 AX200 160MHz");
+        assert_eq!(cmp.vendor_id().unwrap(), "Intel Corporation");
+
+        // we should have a network card description
+        let ComponentDescription::NicDescription(desc) = cmp.desc() else {
+            panic!("wrong one!");
+        };
+
+        // speed is null for this one. it's correct to be none.
+        assert!(desc.max_speed.is_none());
+    }
+
+    #[tracing::instrument]
+    fn ax200_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(root).join("tests/assets/windows/ax200_nic.json")
+    }
 }
