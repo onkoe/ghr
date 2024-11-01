@@ -1,6 +1,9 @@
 [package]
 name = "libghr"
 version = "0.1.0"
+description = "A library to find system information on Windows, Linux, and Android"
+keywords = ["sysinfo", "hw-probe", "hwinfo"]
+categories = ["development-tools", "hardware-support", "os"]
 edition = "2021"
 rust-version = "1.81"
 
@@ -12,7 +15,11 @@ chrono = { version = "0.4.38", default-features = false, features = [
     "now",
     "serde",
 ] }
-futures = { version = "0.3.31", default-features = false, features = ["alloc", "async-await", "std"] }
+futures = { version = "0.3.31", default-features = false, features = [
+    "alloc",
+    "async-await",
+    "std",
+] }
 mac_address = { version = "1.1.7", features = ["serde"] }
 nvml-wrapper = "0.10.0"
 pisserror = "0.3.0-rc.1"
