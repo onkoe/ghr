@@ -13,7 +13,7 @@ use super::{Cache, CpuDescription, Frequency};
 
 /// Grabs info about the computer's processor(s).
 #[tracing::instrument]
-pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     use procfs::{CpuInfo, FromBufRead};
     use std::{fs::File, io::BufReader};
 

@@ -49,10 +49,10 @@ pub enum Cache {
 
 #[tracing::instrument]
 /// Gets info about the CPU.
-pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     #[cfg(target_os = "windows")]
-    return windows::cpu().await;
+    return windows::get().await;
 
     #[cfg(target_os = "linux")]
-    return linux::cpu().await;
+    return linux::get().await;
 }

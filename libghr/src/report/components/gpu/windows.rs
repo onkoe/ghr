@@ -5,7 +5,7 @@ use wmi::Variant;
 
 #[tracing::instrument]
 /// grabs the system's gpus.
-pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
+pub(super) async fn get() -> GhrResult<Vec<ComponentInfo>> {
     // first, grab the wmi connection if we need it
     let wmi = get_wmi()?;
 

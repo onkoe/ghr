@@ -11,7 +11,7 @@ mod generic;
 mod i915;
 
 #[tracing::instrument]
-pub(super) async fn gpus() -> GhrResult<Vec<ComponentInfo>> {
+pub(super) async fn get() -> GhrResult<Vec<ComponentInfo>> {
     // grab devices from the system
     let devices = devices().await?;
 

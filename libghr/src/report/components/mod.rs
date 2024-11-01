@@ -18,11 +18,11 @@ pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
 
     // add components to the set. this prevents a stack overflow on a shared
     // await point!
-    futures.push(cpu::cpu().boxed_local());
-    futures.push(usb::usb_components().boxed_local());
+    futures.push(cpu::get().boxed_local());
+    futures.push(usb::get().boxed_local());
     futures.push(pci::get().boxed_local());
-    futures.push(ram::ram().boxed_local());
-    futures.push(gpu::gpu().boxed_local());
+    futures.push(ram::get().boxed_local());
+    futures.push(gpu::get().boxed_local());
     futures.push(psu::get().boxed_local());
     futures.push(storage::get().boxed_local());
     futures.push(nic::get().boxed_local());

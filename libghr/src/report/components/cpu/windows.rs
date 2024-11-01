@@ -5,7 +5,7 @@ use wmi::Variant;
 use crate::prelude::internal::*;
 
 #[tracing::instrument]
-pub async fn cpu() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     use crate::report::components::windows::get_wmi;
     use std::collections::HashMap;
     use wmi::Variant;

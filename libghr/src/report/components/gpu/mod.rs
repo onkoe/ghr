@@ -25,7 +25,7 @@ pub struct GpuDescription {
 
 #[tracing::instrument]
 /// Gets information about the system's GPU(s).
-pub async fn gpu() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     let mut gpus = Vec::new();
 
     // only run if the platform has nvidia
@@ -35,12 +35,12 @@ pub async fn gpu() -> GhrResult<Vec<ComponentInfo>> {
     }
 
     #[cfg(target_os = "linux")]
-    if let Ok(mut linux_gpus) = linux::gpus().await {
+    if let Ok(mut linux_gpus) = linux::get().await {
         gpus.append(&mut linux_gpus);
     }
 
     #[cfg(target_os = "windows")]
-    if let Ok(mut windows_gpus) = windows::gpus().await {
+    if let Ok(mut windows_gpus) = windows::get().await {
         gpus.append(&mut windows_gpus);
     }
 

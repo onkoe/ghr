@@ -11,7 +11,7 @@ use tokio::try_join;
 
 #[tracing::instrument]
 #[cfg(target_os = "linux")]
-pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     // grab info about usb devices and construct reprs
     let mut usb = Vec::new();
     for dev in super::linux::devices("/sys/bus/usb/devices").await? {
@@ -140,7 +140,7 @@ async fn usb_vendor_and_id(path: &Path) -> (Option<String>, Option<String>) {
 
 #[tracing::instrument]
 #[cfg(target_os = "windows")]
-pub async fn usb_components() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     use super::windows::get_pnp_with_did_prefix;
     use crate::report::components::windows::get_wmi;
 

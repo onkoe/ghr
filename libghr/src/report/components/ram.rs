@@ -26,7 +26,7 @@ pub struct RamDescription {
 
 #[tracing::instrument]
 #[cfg(target_os = "linux")]
-pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     use procfs::{Current, FromRead, Meminfo};
 
     let meminfo = Meminfo::from_file(Meminfo::PATH)
@@ -51,7 +51,7 @@ pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
 
 #[tracing::instrument]
 #[cfg(target_os = "windows")]
-pub async fn ram() -> GhrResult<Vec<ComponentInfo>> {
+pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     use std::collections::HashMap;
     use wmi::Variant;
 
