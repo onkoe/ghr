@@ -20,7 +20,8 @@ pub struct Sleep {
     ///
     /// This is most common on modern machines.
     s2: SleepMode,
-    /// Sometimes known as "modern standby".
+    /// Sometimes known as "modern standby" or "Always On Always Connected",
+    /// "AOAC".
     ///
     /// This allows the system to turn off components as needed, allowing for
     /// intelligent wake-up.
@@ -57,6 +58,16 @@ pub enum SleepMode {
     /// We couldn't collect enough information about whether or not the
     /// system supports this sleep state.
     Unknown,
+}
+
+impl From<bool> for SleepMode {
+    fn from(value: bool) -> Self {
+        if value {
+            Self::Supported
+        } else {
+            Self::Unsupported
+        }
+    }
 }
 
 /// Gets information about supported ACPI sleep states.
