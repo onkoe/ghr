@@ -1,13 +1,19 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use crate::prelude::internal::*;
 
 /// gets info about the computer's sleep states.
+#[tracing::instrument]
 pub(super) async fn get() -> Sleep {
-    todo!()
+    let paths = SleepPaths {
+        state: PathBuf::from("/sys/power/state"),
+    };
+
+    linux_sleep_info(&paths).await
 }
 
 /// gets info about the computer's sleep states.
+#[tracing::instrument]
 async fn linux_sleep_info(paths: &SleepPaths) -> Sleep {
     let mut sleep = Sleep::default();
 
@@ -17,15 +23,12 @@ async fn linux_sleep_info(paths: &SleepPaths) -> Sleep {
         parse_state_file(&mut sleep, &states);
     }
 
-    // if we have root, we can check for `s0i<x>` power states!
-    //
-    // let's make sure we have permissions.
-
-    todo!()
+    sleep
 }
 
-/// mutates the given `Sleep` to account for the info in `/sys/power/states`.
-fn parse_state_file(sleep: &mut Sleep, states: &String) {
+/// mutates the given `Sleep` to account for the info in `/sys/power/state`.
+#[tracing::instrument]
+fn parse_state_file(sleep: &mut Sleep, states: &str) {
     // we need to check for various strings
     //
     // s0: software suspend
@@ -63,9 +66,9 @@ fn parse_state_file(sleep: &mut Sleep, states: &String) {
     };
 }
 
+#[derive(Debug)]
+#[non_exhaustive]
 struct SleepPaths {
-    /// the path to `/sys/power/mem_sleep` (conf).
-    mem_sleep: PathBuf,
-    /// the path to `/sys/power/state` (conf).
+    /// the path to `/sys/power/state`.
     state: PathBuf,
 }
