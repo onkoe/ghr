@@ -57,3 +57,13 @@ pub enum SleepMode {
     /// system supports this sleep state.
     Unknown,
 }
+
+/// Gets information about supported ACPI sleep states.
+#[tracing::instrument]
+pub async fn get() -> Sleep {
+    #[cfg(target_os = "linux")]
+    return linux::get().await;
+
+    #[cfg(target_os = "windows")]
+    return windows::get().await;
+}
