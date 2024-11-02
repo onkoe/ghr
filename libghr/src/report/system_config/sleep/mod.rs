@@ -7,6 +7,10 @@ mod linux;
 #[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
 #[non_exhaustive]
 pub struct Sleep {
+    /// Idle standby, emulated by the operating system.
+    ///
+    /// This can become `s0ix` if the hardware supports it.
+    s0: SleepMode,
     /// Traditional "standby" suspend.
     s1: SleepMode,
     /// Like standby, but the processor's context also needs to be restored.
