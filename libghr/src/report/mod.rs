@@ -29,7 +29,7 @@ impl Report {
         // get the machine identifier (used to uniquely identify the report)
         let machine_id = MachineIdentifier::new_random();
 
-        let (os, machine, components, sys_conf) = tokio::join! {
+        let (os, machine, components, sys_conf) = futures::join! {
             Self::os_info(),
             MachineInfo::new(machine_id),
             components::get_components(),

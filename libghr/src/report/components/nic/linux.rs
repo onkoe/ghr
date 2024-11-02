@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use futures::StreamExt;
-use tokio_stream::wrappers::ReadDirStream;
 
 use crate::prelude::internal::*;
 
@@ -17,14 +16,14 @@ pub(crate) async fn get() -> GhrResult<Vec<ComponentInfo>> {
 /// gets info about all devices at the given path.
 #[tracing::instrument]
 async fn all<P: AsRef<Path> + std::fmt::Debug>(path: P) -> GhrResult<Vec<ComponentInfo>> {
-    let entries = tokio::fs::read_dir(path).await.map_err(|e| {
+    let entries = async_fs::read_dir(path).await.map_err(|e| {
         GhrError::ComponentInfoInaccessible(format!(
             "Couldn't read network interface devices from `sysfs`. (err: {e})"
         ))
     })?;
 
     // iterate over entries, only use good paths, then run them through `one`
-    Ok(ReadDirStream::new(entries)
+    Ok(entries
         .map(|res| res.map(|entry| entry.path()))
         .filter_map(|res| async { res.ok() })
         .filter_map(one)
@@ -41,7 +40,7 @@ async fn one<P: AsRef<Path> + std::fmt::Debug>(path: P) -> Option<ComponentInfo>
     let path = path.as_ref();
 
     // grab pci class, name, and vendor
-    let (class, name, vendor) = tokio::join! {
+    let (class, name, vendor) = futures::join! {
         sysfs_value_opt::<String>(path.join("device/class")),
         sysfs_value_opt::<String>(path.join("device/device")),
         sysfs_value_opt::<String>(path.join("device/vendor")),
@@ -54,7 +53,7 @@ async fn one<P: AsRef<Path> + std::fmt::Debug>(path: P) -> Option<ComponentInfo>
     );
 
     // also grab the speed and mtu from `sysfs`
-    let (speed, mtu) = tokio::join! {
+    let (speed, mtu) = futures::join! {
         sysfs_value_opt::<u32>(path.join("speed")),
         sysfs_value_opt::<u32>(path.join("mtu")),
     };

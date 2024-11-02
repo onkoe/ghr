@@ -16,7 +16,7 @@ where
     V::Err: Display, // ensure its error can be printed
 {
     // read the file from disk
-    let string = tokio::fs::read_to_string(&path).await.map_err(|e| {
+    let string = async_fs::read_to_string(&path).await.map_err(|e| {
         tracing::warn!("Failed to read string from `sysfs`.");
         GhrError::ComponentInfoInaccessible(format!(
             "Failed to read component info on `sysfs`. (path: `{path:?}`, err: {e}"
@@ -64,7 +64,7 @@ impl Civ {
         let path = path.as_ref().join("device/");
 
         // read all three values
-        let (class, id, vendor) = tokio::join! {
+        let (class, id, vendor) = futures::join! {
             sysfs_value_opt::<String>(path.join("class")),
             sysfs_value_opt::<String>(path.join("device")),
             sysfs_value_opt::<String>(path.join("vendor")),

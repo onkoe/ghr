@@ -5,7 +5,7 @@ use crate::prelude::internal::*;
 #[tracing::instrument]
 pub(super) async fn gpu(gpu: &Path) -> GhrResult<ComponentInfo> {
     // grab some id info about the gpu
-    let (id, vendor_id, class) = tokio::join! {
+    let (id, vendor_id, class) = futures::join! {
         sysfs_value_opt::<String>(gpu.join("device/device")),
         sysfs_value_opt::<String>(gpu.join("device/vendor")),
         sysfs_value_opt::<String>(gpu.join("device/class")),

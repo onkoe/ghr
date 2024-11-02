@@ -9,7 +9,9 @@ rust-version = "1.81"
 
 [dependencies]
 argon2 = "0.5.3"
+async-fs = "2.1.2"
 base64 = "0.22.1"
+blocking = "1.6.1"
 chrono = { version = "0.4.38", default-features = false, features = [
     "alloc",
     "now",
@@ -32,8 +34,6 @@ serde = { version = "1.0.210", default-features = false, features = [
     "serde_derive",
     "std",
 ] }
-tokio = { version = "1.40.0", features = ["fs", "macros", "rt"] }
-tokio-stream = { version = "0.1.16", features = ["fs"] }
 tracing = { version = "0.1.40", features = ["async-await"] }
 ts-rs = { version = "10.0.0", features = ["uuid-impl", "chrono-impl"] }
 
@@ -49,7 +49,12 @@ windows-version = "0.1.1"
 
 [dev-dependencies]
 serde_json = "1.0.128"
-tokio = { version = "1.40.0", features = ["fs", "macros", "rt"] }
+tokio = { version = "1.40.0", features = [
+    "fs",
+    "macros",
+    "rt",
+    "rt-multi-thread",
+] }
 tracing-subscriber = "0.3.18"
 reqwest = { version = "0.12", default-features = false, features = [
     "json",

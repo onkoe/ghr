@@ -210,20 +210,21 @@ pub enum Removability {
 // all this helps with accessing devices on linux
 #[cfg(target_os = "linux")]
 mod linux {
+    use async_fs::DirEntry;
+    use futures::StreamExt as _;
+
     use crate::prelude::internal::*;
 
     use std::path::Path;
-    use tokio::fs::DirEntry;
-    use tokio_stream::{wrappers::ReadDirStream, StreamExt};
 
     #[tracing::instrument(skip(path))]
     pub(super) async fn devices(path: impl AsRef<Path>) -> GhrResult<Vec<DirEntry>> {
-        let all_devices = tokio::fs::read_dir(path)
+        let all_devices = async_fs::read_dir(path)
             .await
             .map_err(|e| GhrError::ComponentInfoInaccessible(e.to_string()))?;
 
-        Ok(ReadDirStream::new(all_devices)
-            .filter_map(|dev| dev.ok())
+        Ok(all_devices
+            .filter_map(|dev| async { dev.ok() })
             .collect::<Vec<_>>()
             .await)
     }

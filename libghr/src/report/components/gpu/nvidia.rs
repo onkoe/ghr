@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
+use futures::StreamExt;
 use nvml_wrapper::{enum_wrappers::device::Clock, enums::device::BusType, error::NvmlError, Nvml};
-use tokio::task::JoinSet;
 
 use crate::prelude::internal::*;
 
@@ -41,19 +41,17 @@ async fn loop_on_devices(nvml: Nvml) -> Result<Vec<ComponentInfo>, NvmlError> {
     let device_count = nvml.device_count()?;
 
     // make a new future for each device
-    let mut futures = JoinSet::new();
-    for device_id in 0..device_count {
+    let mut futures = futures::stream::iter((0..device_count).map(|device_id| {
         let local_nvml = Arc::clone(&nvml);
-        futures.spawn_blocking(move || check_device(local_nvml, device_id));
-    }
+        blocking::unblock(move || check_device(local_nvml, device_id))
+    }))
+    .buffer_unordered(2);
 
-    // run all the futures concurrently
-    let devices = futures
-        .join_all()
-        .await
-        .into_iter()
-        .flatten()
-        .collect::<Vec<_>>();
+    // get all devices
+    let mut devices = Vec::new();
+    while let Some(Some(dev)) = futures.next().await {
+        devices.push(dev);
+    }
 
     Ok(devices)
 }
