@@ -8,21 +8,22 @@ mod linux;
 #[non_exhaustive]
 pub struct Sleep {
     /// Traditional "standby" suspend.
-    s1: bool,
+    s1: SleepMode,
     /// Like standby, but the processor's context also needs to be restored.
     ///
     /// This is most common on modern machines.
-    s2: bool,
-    /// Sometimes known as "modern standby" or "s2idle".
+    s2: SleepMode,
+    /// Sometimes known as "modern standby".
     ///
     /// This allows the system to turn off components as needed, allowing for
     /// intelligent wake-up.
-    s0ix: bool,
+    s0ix: SleepMode,
     /// "Suspend-to-RAM". RAM is powered to maintain pre-sleeping state.
-    s3: bool,
+    s3: SleepMode,
     /// "Suspend-to-disk", or "hibernation". Everything is turned off and the
     /// system may fully power down.
-    s4: bool,
+    s4: SleepMode,
+}
 
 /// Indicates whether or not a sleep state (e.g., "S2") is
 /// supported by the computer.
