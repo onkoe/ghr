@@ -29,6 +29,19 @@ pub struct Sleep {
     s4: SleepMode,
 }
 
+impl Default for Sleep {
+    fn default() -> Self {
+        Self {
+            s0: SleepMode::Unknown,
+            s1: SleepMode::Unknown,
+            s2: SleepMode::Unknown,
+            s0ix: SleepMode::Unknown,
+            s3: SleepMode::Unknown,
+            s4: SleepMode::Unknown,
+        }
+    }
+}
+
 /// Indicates whether or not a sleep state (e.g., "S2") is
 /// supported by the computer.
 #[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
