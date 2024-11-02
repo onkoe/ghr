@@ -29,8 +29,8 @@ pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
 
     // iterate over each future in the stream.
     let mut components = Vec::new();
-    while let Some(comp) = futures.next().await {
-        components.push(comp?);
+    while let Some(comp) = futures.next().await.and_then(|fut| fut.ok()) {
+        components.push(comp);
     }
 
     Ok(components
