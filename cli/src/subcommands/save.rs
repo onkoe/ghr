@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
-pub async fn save(_save_path: PathBuf) -> anyhow::Result<()> {
+/// Saves the `Report` to disk as JSON.
+pub async fn run(_save_path: PathBuf) -> anyhow::Result<()> {
     Ok(())
 }

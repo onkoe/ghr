@@ -33,13 +33,13 @@ async fn main() {
 
     // run the command the user asked for
     match args.subcommands {
-        Subcommands::Save { save_path } => save(save_path).await,
+        Subcommands::Save { save_path } => save::run(save_path).await,
         Subcommands::Upload {
             server,
             confirm_without_prompt,
             save_path,
             shared,
-        } => upload(server, confirm_without_prompt, save_path, shared).await,
+        } => upload::run(server, confirm_without_prompt, save_path, shared).await,
     }
     .expect("a subcommand failed to execute");
 }
