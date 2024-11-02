@@ -4,7 +4,7 @@ use colored::Colorize as _;
 
 use crate::{args::SharedArgs, get_report, log::log_location};
 
-pub async fn upload(
+pub async fn run(
     server: String,
     confirm_without_prompt: bool,
     _save_path: Option<PathBuf>,
