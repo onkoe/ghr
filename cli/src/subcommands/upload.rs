@@ -34,7 +34,7 @@ pub async fn run(
                 )
             });
 
-            if let Ok(_) = result {
+            if result.is_ok() {
                 match input.trim().to_ascii_lowercase().as_str() {
                     "yes" | "y" | "t" | "true" | "yuh" | "" => {
                         break;
