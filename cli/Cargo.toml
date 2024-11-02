@@ -14,7 +14,7 @@ clap = { version = "4.5.20", features = ["derive", "color"] }
 indicatif = "0.17.8"
 reqwest = "0.12.9"
 termcolor = "1.4.1"
-tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread", "fs"] }
 libghr = { path = "../libghr" }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
