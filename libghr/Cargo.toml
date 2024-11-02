@@ -56,10 +56,7 @@ tokio = { version = "1.40.0", features = [
     "rt-multi-thread",
 ] }
 tracing-subscriber = "0.3.18"
-reqwest = { version = "0.12", default-features = false, features = [
-    "json",
-    "rustls-tls",
-] }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
 whoami = { version = "1.5.2", default-features = false }
 rpassword = "7.3.1"
 clap = { version = "4.5", features = ["derive"] }
