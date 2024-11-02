@@ -38,7 +38,7 @@ impl Report {
 
             components: components?,
 
-            sys_conf: system_config::SystemConfInfo {},
+            sys_conf: system_config::SystemConfInfo { sleep: todo!() },
         })
     }
 
