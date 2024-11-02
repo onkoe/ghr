@@ -29,21 +29,13 @@ async fn linux_sleep_info(paths: &SleepPaths) -> Sleep {
 /// mutates the given `Sleep` to account for the info in `/sys/power/state`.
 #[tracing::instrument]
 fn parse_state_file(sleep: &mut Sleep, states: &str) {
-    // we need to check for various strings
+    // we need to check for various strings.
     //
     // s0: software suspend
-    sleep.s0 = if states.contains("freeze") | states.contains("s2idle") {
-        SleepMode::Supported
-    } else {
-        SleepMode::Unsupported
-    };
+    sleep.s0 = (states.contains("freeze") || states.contains("s2idle")).into();
 
     // s1: naive standby
-    sleep.s1 = if states.contains("shallow") | states.contains("standby") {
-        SleepMode::Supported
-    } else {
-        SleepMode::Unsupported
-    };
+    sleep.s1 = (states.contains("shallow") || states.contains("standby")).into();
 
     // s2: naive standby with cpu powered down.
     //
@@ -52,18 +44,10 @@ fn parse_state_file(sleep: &mut Sleep, states: &str) {
     sleep.s2 = SleepMode::Unknown;
 
     // s3: suspend-to-ram
-    sleep.s3 = if states.contains("deep") {
-        SleepMode::Supported
-    } else {
-        SleepMode::Unsupported
-    };
+    sleep.s3 = states.contains("deep").into();
 
     // s4: suspend-to-disk (hibernation!)
-    sleep.s4 = if states.contains("disk") {
-        SleepMode::Supported
-    } else {
-        SleepMode::Unsupported
-    };
+    sleep.s4 = states.contains("disk").into();
 }
 
 #[derive(Debug)]
