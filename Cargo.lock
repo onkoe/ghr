@@ -1626,6 +1626,7 @@ dependencies = [
  "ts-rs",
  "usb-ids",
  "whoami",
+ "windows",
  "windows-version",
  "wmi",
 ]
