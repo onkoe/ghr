@@ -1,0 +1,651 @@
+{
+  "os": {
+    "name": "Linux",
+    "distro_name": "Fedora Linux Asahi Remix 40 (Workstation Edition)",
+    "version": "6.11.0-400.asahi.fc40.aarch64+16k",
+    "architecture": "aarch64",
+    "other": {
+      "domainname": "(none)",
+      "nodename": "fedora",
+      "version": "#1 SMP PREEMPT_DYNAMIC Fri Sep 27 02:59:31 UTC 2024"
+    }
+  },
+  "machine": {
+    "vendor": null,
+    "model": null,
+    "bios": {
+      "vendor": null,
+      "version": null,
+      "date": null
+    },
+    "chassis": {
+      "kind": null,
+      "vendor": null,
+      "version": null
+    },
+    "hash": {
+      "Random": [
+        152,
+        119,
+        21,
+        111,
+        100,
+        106,
+        130,
+        175,
+        223,
+        252,
+        154,
+        12,
+        249,
+        46,
+        63,
+        134,
+        246,
+        134,
+        203,
+        64,
+        30,
+        38,
+        129,
+        74,
+        112,
+        170,
+        208,
+        107,
+        90,
+        217
+      ]
+    }
+  },
+  "components": [
+    {
+      "bus": "Sys",
+      "id": null,
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "CpuDescription": {
+          "clock_speed": {
+            "min": 600,
+            "max": 3228
+          },
+          "core_ct": 8,
+          "cache": [
+            {
+              "L2": {
+                "size": 4096,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 64,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L2": {
+                "size": 4096,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 64,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L2": {
+                "size": 12288,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 192,
+                "speed": null
+              }
+            },
+            {
+              "L2": {
+                "size": 12288,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 192,
+                "speed": null
+              }
+            },
+            {
+              "L2": {
+                "size": 12288,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 192,
+                "speed": null
+              }
+            },
+            {
+              "L2": {
+                "size": 12288,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 192,
+                "speed": null
+              }
+            },
+            {
+              "L2": {
+                "size": 12288,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 192,
+                "speed": null
+              }
+            },
+            {
+              "L2": {
+                "size": 12288,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 128,
+                "speed": null
+              }
+            },
+            {
+              "L1": {
+                "size": 192,
+                "speed": null
+              }
+            }
+          ],
+          "cores": [
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 4096,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 64,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 2064
+              }
+            },
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 4096,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 64,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 2064
+              }
+            },
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 12288,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 192,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 3228
+              }
+            },
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 12288,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 192,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 3228
+              }
+            },
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 12288,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 192,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 3228
+              }
+            },
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 12288,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 192,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 3228
+              }
+            },
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 12288,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 192,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 3228
+              }
+            },
+            {
+              "cache": [
+                {
+                  "L2": {
+                    "size": 12288,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 128,
+                    "speed": null
+                  }
+                },
+                {
+                  "L1": {
+                    "size": 192,
+                    "speed": null
+                  }
+                }
+              ],
+              "speeds": {
+                "min": 600,
+                "max": 3228
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "bus": "Pci",
+      "id": "Genesys Logic, Inc",
+      "class": "Generic system peripheral (SD Host controller)",
+      "vendor_id": "GL9755 SD Host Controller",
+      "status": null,
+      "desc": "None"
+    },
+    {
+      "bus": "Pci",
+      "id": "0x106b",
+      "class": "Bridge (PCI bridge)",
+      "vendor_id": "0x100c",
+      "status": null,
+      "desc": "None"
+    },
+    {
+      "bus": "Pci",
+      "id": "0x14e4",
+      "class": "Network controller (Network controller)",
+      "vendor_id": "0x4433",
+      "status": null,
+      "desc": "None"
+    },
+    {
+      "bus": "Pci",
+      "id": "0x106b",
+      "class": "Bridge (PCI bridge)",
+      "vendor_id": "0x100c",
+      "status": null,
+      "desc": "None"
+    },
+    {
+      "bus": "Pci",
+      "id": "Broadcom Inc. and subsidiaries",
+      "class": "Network controller (Network controller)",
+      "vendor_id": "BRCM4387 Bluetooth Controller",
+      "status": null,
+      "desc": "None"
+    },
+    {
+      "bus": "Sys",
+      "id": null,
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "RamDescription": {
+          "total_phsyical_memory": 33410662400,
+          "configured_clock_speed": null,
+          "configured_voltage": null,
+          "removable": null
+        }
+      }
+    },
+    {
+      "bus": "Pci",
+      "id": null,
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "GpuDescription": {
+          "clock_speed": null,
+          "video_memory": null,
+          "video_memory_speed": null
+        }
+      }
+    },
+    {
+      "bus": "Pci",
+      "id": null,
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "GpuDescription": {
+          "clock_speed": null,
+          "video_memory": null,
+          "video_memory_speed": null
+        }
+      }
+    },
+    {
+      "bus": "Sys",
+      "id": "bq40z651",
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "PowerSupplyDescription": {
+          "Battery": {
+            "technology": null,
+            "real_capacity_wh": 58.3794,
+            "theoretical_capacity_wh": 69.255,
+            "cycle_count": 430
+          }
+        }
+      }
+    },
+    {
+      "bus": "Unknown",
+      "id": "APPLE SSD AP0512R",
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "StorageDescription": {
+          "kind": "Ssd",
+          "usage": {
+            "usage": null,
+            "total_capacity": 3908420256
+          },
+          "speed": null,
+          "connector": null,
+          "is_removable": false
+        }
+      }
+    },
+    {
+      "bus": "Unknown",
+      "id": "APPLE SSD AP0512R",
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "StorageDescription": {
+          "kind": "Ssd",
+          "usage": {
+            "usage": null,
+            "total_capacity": 24576
+          },
+          "speed": null,
+          "connector": null,
+          "is_removable": false
+        }
+      }
+    },
+    {
+      "bus": "Unknown",
+      "id": null,
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "StorageDescription": {
+          "kind": "Ssd",
+          "usage": {
+            "usage": null,
+            "total_capacity": 268435456
+          },
+          "speed": null,
+          "connector": null,
+          "is_removable": false
+        }
+      }
+    },
+    {
+      "bus": "Unknown",
+      "id": "APPLE SSD AP0512R",
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "StorageDescription": {
+          "kind": "Ssd",
+          "usage": {
+            "usage": null,
+            "total_capacity": 1048576
+          },
+          "speed": null,
+          "connector": null,
+          "is_removable": false
+        }
+      }
+    },
+    {
+      "bus": "Unknown",
+      "id": null,
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "NicDescription": {
+          "max_speed": 10000,
+          "mtu": 2800
+        }
+      }
+    },
+    {
+      "bus": "Unknown",
+      "id": null,
+      "class": null,
+      "vendor_id": null,
+      "status": null,
+      "desc": {
+        "NicDescription": {
+          "max_speed": null,
+          "mtu": 65536
+        }
+      }
+    },
+    {
+      "bus": "Unknown",
+      "id": "0x4433",
+      "class": "Network controller (Network controller)",
+      "vendor_id": "0x14e4",
+      "status": null,
+      "desc": {
+        "NicDescription": {
+          "max_speed": null,
+          "mtu": 1500
+        }
+      }
+    }
+  ],
+  "sys_conf": {}
+}

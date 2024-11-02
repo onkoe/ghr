@@ -33,7 +33,7 @@ async fn main() {
 
     // run the command the user asked for
     match args.subcommands {
-        Subcommands::Save { save_path } => save::run(save_path).await,
+        Subcommands::Save { save_path } => save::run(&save_path).await,
         Subcommands::Upload {
             server,
             confirm_without_prompt,
