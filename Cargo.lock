@@ -3,6 +3,17 @@
 version = 3
 
 [[package]]
+name = "acpi"
+version = "4.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "654f48ab3178632ea535be1765073b990895cb62f70a7e5671975d7150c26d15"
+dependencies = [
+ "bit_field",
+ "log",
+ "rsdp",
+]
+
+[[package]]
 name = "actix-codec"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -408,6 +419,12 @@ name = "bit-vec"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2c54ff287cfc0a34f38a6b832ea1bd8e448a330b3e40a50859e6488bee07f22"
+
+[[package]]
+name = "bit_field"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc827186963e592360843fb5ba4b973e145841266c1357f7180c43526f2e5b61"
 
 [[package]]
 name = "bitflags"
@@ -1343,6 +1360,7 @@ checksum = "8e9489c2807c139ffd9c1794f4af0ebe86a828db53ecdc7fea2111d0fed085d1"
 name = "libghr"
 version = "0.1.0"
 dependencies = [
+ "acpi",
  "almost",
  "argon2",
  "base64",
@@ -2136,6 +2154,15 @@ dependencies = [
  "spki",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "rsdp"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1ed5f33bb98eace335c13cdd159fbfc73ce203b597981a76832dfbb9cbd8101b"
+dependencies = [
+ "log",
 ]
 
 [[package]]

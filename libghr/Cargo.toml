@@ -42,6 +42,10 @@ nix = { version = "0.29.0", features = ["feature"] }
 usb-ids = "1.2024.4"
 pci-ids = "0.2.5"
 procfs = "0.17.0"
+# note: 5.1 is not compatible due to the lack of a userspace constructor.
+#
+# so don't update pls!
+acpi = "4.1.1"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 wmi = "0.14.0"
