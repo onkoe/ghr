@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-#[expect(unused)]
-pub async fn save(save_path: PathBuf) -> anyhow::Result<()> {
+pub async fn save(_save_path: PathBuf) -> anyhow::Result<()> {
     Ok(())
 }

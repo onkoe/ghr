@@ -4,11 +4,10 @@ use colored::Colorize as _;
 
 use crate::{args::SharedArgs, get_report, log::log_location};
 
-#[expect(unused)]
 pub async fn upload(
     server: String,
     confirm_without_prompt: bool,
-    save_path: Option<PathBuf>,
+    _save_path: Option<PathBuf>,
     _shared: SharedArgs,
 ) -> anyhow::Result<()> {
     // grab a report
@@ -73,6 +72,7 @@ pub async fn upload(
     {
         Ok(r) => r.await,
         Err(e) => {
+            tracing::warn!("Couldn't upload the report. (err: {e})");
             println!(
                 "{}",
                 "Failed to upload the report. Please check your internet connection.".red()
@@ -93,6 +93,8 @@ pub async fn upload(
             );
         }
         Err(e) => {
+            tracing::warn!("Couldn't read server response. (err: {e})");
+
             println!(
                 "{}",
                 "Couldn't read the response for the database entry.".red()
