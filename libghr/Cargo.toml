@@ -45,7 +45,6 @@ procfs = "0.17.0"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 wmi = "0.14.0"
-
 windows-version = "0.1.1"
 
 [dev-dependencies]

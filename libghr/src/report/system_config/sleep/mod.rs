@@ -23,4 +23,16 @@ pub struct Sleep {
     /// "Suspend-to-disk", or "hibernation". Everything is turned off and the
     /// system may fully power down.
     s4: bool,
+
+/// Indicates whether or not a sleep state (e.g., "S2") is
+/// supported by the computer.
+#[derive(Clone, Debug, PartialEq, PartialOrd, serde::Serialize, serde::Deserialize, TypeScript)]
+pub enum SleepMode {
+    /// Definitively supported.
+    Supported,
+    /// Definitively NOT supported.
+    Unsupported,
+    /// We couldn't collect enough information about whether or not the
+    /// system supports this sleep state.
+    Unknown,
 }

@@ -16,7 +16,10 @@ pub(crate) mod internal {
             },
             machine::MachineInfo,
             os::OperatingSystemInfo,
-            system_config::{sleep::Sleep, SystemConfInfo},
+            system_config::{
+                sleep::{Sleep, SleepMode},
+                SystemConfInfo,
+            },
             util::unit_to_mibiunits,
             Report,
         },
