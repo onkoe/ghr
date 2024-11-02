@@ -3,6 +3,7 @@
 //! this can be used for unit testing!
 
 #[cfg(target_os = "windows")]
+#[tracing::instrument]
 fn main() {
     use std::{collections::HashMap, io::Write, path::PathBuf};
     use wmi::{COMLibrary, Variant};
@@ -24,6 +25,7 @@ fn main() {
 }
 
 #[cfg(not(target_os = "windows"))]
+#[tracing::instrument]
 fn main() {
     println!("why are you running this");
 }

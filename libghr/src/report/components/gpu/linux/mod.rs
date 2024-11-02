@@ -1,5 +1,6 @@
+use async_fs::{self, read_link, DirEntry};
+use futures::TryStreamExt;
 use regex::Regex;
-use tokio::fs::{self, read_link, DirEntry};
 
 use crate::prelude::internal::*;
 
@@ -73,7 +74,7 @@ async fn devices() -> GhrResult<Vec<DirEntry>> {
     })?;
 
     // grab directory
-    let mut entries = fs::read_dir(GPU_LISTING).await.map_err(|e| {
+    let mut entries = async_fs::read_dir(GPU_LISTING).await.map_err(|e| {
         tracing::error!(
             "Failed to read the `{GPU_LISTING}` directory on Linux, which should be static."
         );
@@ -82,7 +83,7 @@ async fn devices() -> GhrResult<Vec<DirEntry>> {
 
     // grab only the entries we want
     let mut gpus = Vec::new();
-    while let Ok(Some(en)) = entries.next_entry().await {
+    while let Ok(Some(en)) = entries.try_next().await {
         // we only want directories that look like `cardN`.
         let name = en.file_name();
 

@@ -12,7 +12,7 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
         let path = dev.path();
 
         // load its vendor id and product name
-        let (vendor, product, class) = tokio::join!(
+        let (vendor, product, class) = futures::join!(
             sysfs_value_opt::<String>(path.join("vendor")),
             sysfs_value_opt::<String>(path.join("device")),
             sysfs_value_opt::<String>(path.join("class")),

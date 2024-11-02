@@ -7,7 +7,7 @@ pub(super) async fn gpu(gpu: &Path) -> GhrResult<ComponentInfo> {
     let gpu = gpu.join("device");
 
     // grab some id info about the gpu
-    let (id, vendor_id, class) = tokio::join! {
+    let (id, vendor_id, class) = futures::join! {
         sysfs_value_opt::<String>(gpu.join("device")),
         sysfs_value_opt::<String>(gpu.join("vendor")),
         sysfs_value_opt::<String>(gpu.join("class")),
@@ -20,7 +20,7 @@ pub(super) async fn gpu(gpu: &Path) -> GhrResult<ComponentInfo> {
     );
 
     // and now some device info
-    let (video_memory, clock_speed, video_memory_speed) = tokio::join! {
+    let (video_memory, clock_speed, video_memory_speed) = futures::join! {
         sysfs_value_opt::<u64>(gpu.join("mem_info_vram_total")),
         gpu_clock(&gpu),
         gpu_mem_clock(&gpu)

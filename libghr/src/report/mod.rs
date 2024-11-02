@@ -26,19 +26,23 @@ impl Report {
     #[tracing::instrument]
     /// Attempts to assemble a new `Report`.
     pub async fn new() -> Result<Self, GhrError> {
-        let (os, machine, components) = tokio::join! {
+        // get the machine identifier (used to uniquely identify the report)
+        let machine_id = MachineIdentifier::new_random();
+
+        let (os, machine, components, sys_conf) = futures::join! {
             Self::os_info(),
-            MachineInfo::new(MachineIdentifier::new_random()),
+            MachineInfo::new(machine_id),
             components::get_components(),
+            SystemConfInfo::new()
         };
+
+        tracing::debug!("Finished report creation!");
 
         Ok(Self {
             os: os?,
             machine, // TODO: use the real one
-
             components: components?,
-
-            sys_conf: system_config::SystemConfInfo {},
+            sys_conf,
         })
     }
 

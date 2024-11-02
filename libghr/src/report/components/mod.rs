@@ -1,4 +1,4 @@
-use futures::{stream::FuturesUnordered, FutureExt as _, StreamExt};
+use futures::{FutureExt as _, StreamExt};
 
 use crate::prelude::internal::*;
 
@@ -14,23 +14,46 @@ pub mod usb;
 #[tracing::instrument]
 /// Grabs any known components (devices) on the system.
 pub async fn get_components() -> GhrResult<Vec<ComponentInfo>> {
-    let mut futures = FuturesUnordered::new();
-
     // add components to the set. this prevents a stack overflow on a shared
     // await point!
-    futures.push(cpu::get().boxed_local());
-    futures.push(usb::get().boxed_local());
-    futures.push(pci::get().boxed_local());
-    futures.push(ram::get().boxed_local());
-    futures.push(gpu::get().boxed_local());
-    futures.push(psu::get().boxed_local());
-    futures.push(storage::get().boxed_local());
-    futures.push(nic::get().boxed_local());
+    //
+    // note that this requires that the tasks all complete on the same thread,
+    // meaning only limited 'true' parallelism :(
+    let mut futures = futures::stream::iter([
+        cpu::get().boxed_local(),
+        usb::get().boxed_local(),
+        pci::get().boxed_local(),
+        ram::get().boxed_local(),
+        gpu::get().boxed_local(),
+        psu::get().boxed_local(),
+        storage::get().boxed_local(),
+        nic::get().boxed_local(),
+    ])
+    .buffer_unordered(3);
+
+    // FIXME(bray): the above can be optimized on non-Windows platforms by only
+    // boxing the futures for Windows. we can totally avoid it.
+    //
+    // however, i don't expect this function to be ran thousands of times
+    // concurrently, so it's pretty low-priority.
+    //
+    // also, note that you CANNOT use a `tokio` runtime for this, as spawning
+    // one and using `on_thread_start` will cause the `thread_local!` to become
+    // an unsafe access with `COMLibrary::assume_initialized`. this assertion
+    // would be true for us, but for any users of individual modules, we'd have
+    // to make them hold the same invariant. which would require making ALL of
+    // them unsafe!!!
+    //
+    // and i'm not doing that.
+    //
+    // so for now, we'll use this slow-ahh `BufferUnordered` with a stream,
+    // just waiting for tasks to complete and sending them to the vec when they
+    // do...
 
     // iterate over each future in the stream.
     let mut components = Vec::new();
-    while let Some(comp) = futures.next().await {
-        components.push(comp?);
+    while let Some(comp) = futures.next().await.and_then(|fut| fut.ok()) {
+        components.push(comp);
     }
 
     Ok(components
@@ -187,20 +210,21 @@ pub enum Removability {
 // all this helps with accessing devices on linux
 #[cfg(target_os = "linux")]
 mod linux {
+    use async_fs::DirEntry;
+    use futures::StreamExt as _;
+
     use crate::prelude::internal::*;
 
     use std::path::Path;
-    use tokio::fs::DirEntry;
-    use tokio_stream::{wrappers::ReadDirStream, StreamExt};
 
     #[tracing::instrument(skip(path))]
     pub(super) async fn devices(path: impl AsRef<Path>) -> GhrResult<Vec<DirEntry>> {
-        let all_devices = tokio::fs::read_dir(path)
+        let all_devices = async_fs::read_dir(path)
             .await
             .map_err(|e| GhrError::ComponentInfoInaccessible(e.to_string()))?;
 
-        Ok(ReadDirStream::new(all_devices)
-            .filter_map(|dev| dev.ok())
+        Ok(all_devices
+            .filter_map(|dev| async { dev.ok() })
             .collect::<Vec<_>>()
             .await)
     }

@@ -1,5 +1,4 @@
 use futures::StreamExt as _;
-use tokio_stream::wrappers::ReadDirStream;
 
 use crate::prelude::internal::*;
 use std::{
@@ -47,7 +46,7 @@ async fn general_info<P: AsRef<Path> + Debug>(path: P) -> (Option<String>, Optio
     // find the real path
     let path = path.as_ref();
 
-    tokio::join! {
+    futures::join! {
         sysfs_value_opt(path.join("device/model")),
         sysfs_value_opt(path.join("device/vendor"))
     }
@@ -59,7 +58,7 @@ async fn storage_desc<P: AsRef<Path> + Debug>(path: P) -> StorageDescription {
     // grab the real path
     let path = path.as_ref();
 
-    let (kind, capacity, speed, connector, is_removable) = tokio::join! {
+    let (kind, capacity, speed, connector, is_removable) = futures::join! {
         kind(path),
         capacity(path),
         sysfs_value_opt::<u32>(path.join("queue/rotation_rate")), // rare?
@@ -177,7 +176,7 @@ async fn capacity<P: AsRef<Path> + Debug>(path: P) -> Option<u64> {
     // read the value...
     //
     // note: it's in sectors!
-    let (sector_count, sector_width) = tokio::join! {
+    let (sector_count, sector_width) = futures::join! {
         sysfs_value_opt::<u64>(path.join("size")),
         sysfs_value_opt::<u64>(path.join("queue/physical_block_size"))
     };
@@ -197,14 +196,14 @@ async fn capacity<P: AsRef<Path> + Debug>(path: P) -> Option<u64> {
 #[tracing::instrument]
 async fn storage_device_entries<P: AsRef<Path> + Debug>(path: P) -> GhrResult<Vec<PathBuf>> {
     // grab all entries from that dir
-    let entries = tokio::fs::read_dir(path).await.map_err(|e| {
+    let entries = async_fs::read_dir(path).await.map_err(|e| {
         GhrError::ComponentInfoInaccessible(format!(
             "Failed to read block devices from `sysfs` (err: {e})"
         ))
     })?;
 
     // use futures::stream to grab each entry's path
-    let paths = ReadDirStream::new(entries)
+    let paths = entries
         .map(|res| res.map(|entry| entry.path()))
         .filter_map(|res| async { res.ok() })
         .collect::<Vec<_>>()
@@ -222,8 +221,7 @@ async fn storage_device_entries<P: AsRef<Path> + Debug>(path: P) -> GhrResult<Ve
     // finally, check for devices (`sda`) and remove any partitions (`sda1`)
     let devices = futures::stream::iter(paths)
         .filter_map(|path| async {
-            let fr_path = tokio::fs::canonicalize(&path).await.ok()?;
-            tracing::error!("REMOVE ME(FOUND ENTRY AT PATH): {fr_path:#?}");
+            let fr_path = async_fs::canonicalize(&path).await.ok()?;
 
             // check if the path's second-to-last path component contains any of
             // the dir names we got.
@@ -351,6 +349,7 @@ mod tests {
         ))
     }
 
+    #[tracing::instrument]
     fn hdd_path() -> PathBuf {
         let root = env!("CARGO_MANIFEST_DIR");
         PathBuf::from(format!(

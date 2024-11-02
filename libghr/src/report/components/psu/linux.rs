@@ -28,7 +28,7 @@ async fn one<P: AsRef<Path> + std::fmt::Debug>(path: P) -> Option<ComponentInfo>
     let path = path.as_ref();
 
     // read a few files to get important info about this thang
-    let (vendor_id, id, kind) = tokio::join! {
+    let (vendor_id, id, kind) = futures::join! {
         sysfs_value_opt::<String>(path.join("manufacturer")),
         sysfs_value_opt::<String>(path.join("model_name")),
         sysfs_value_opt::<String>(path.join("type")),
@@ -77,7 +77,7 @@ async fn battery_info(path: &Path) -> Option<PowerSupplyDescription> {
         charge_full_uah,
         voltage_max_uv,
         voltage_max_design_uv,
-    ) = tokio::join! {
+    ) = futures::join! {
         sysfs_value_opt::<i32>(path.join("cycle_count")),
         sysfs_value_opt::<String>(path.join("technology")),
         sysfs_value_opt::<u64>(path.join("energy_full_design")),

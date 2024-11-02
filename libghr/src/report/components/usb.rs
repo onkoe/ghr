@@ -3,11 +3,11 @@
 use crate::prelude::internal::*;
 
 #[cfg(target_os = "linux")]
+use futures::join;
+#[cfg(target_os = "linux")]
+use futures::try_join;
+#[cfg(target_os = "linux")]
 use std::path::Path;
-#[cfg(target_os = "linux")]
-use tokio::join;
-#[cfg(target_os = "linux")]
-use tokio::try_join;
 
 #[tracing::instrument]
 #[cfg(target_os = "linux")]
@@ -43,8 +43,8 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
 async fn usb_class(path: &Path) -> Option<String> {
     // read the files
     let Ok((class, subclass)) = try_join!(
-        tokio::fs::read_to_string(path.join("bDeviceClass")),
-        tokio::fs::read_to_string(path.join("bDeviceSubClass")),
+        async_fs::read_to_string(path.join("bDeviceClass")),
+        async_fs::read_to_string(path.join("bDeviceSubClass")),
     ) else {
         tracing::warn!(
             "Failed to find device class/subclass! Yielding 'Unknown' for these values."
@@ -75,9 +75,9 @@ async fn usb_vendor_and_id(path: &Path) -> (Option<String>, Option<String>) {
     // look for human-readable string repr
 
     use usb_ids::FromId as _;
-    let human_readable = tokio::join! {
-        tokio::fs::read_to_string(path.join("iManufacturer")),
-        tokio::fs::read_to_string(path.join("iProduct")),
+    let human_readable = futures::join! {
+        async_fs::read_to_string(path.join("iManufacturer")),
+        async_fs::read_to_string(path.join("iProduct")),
     };
 
     // return human-readable strings if they exist for us!
@@ -89,9 +89,9 @@ async fn usb_vendor_and_id(path: &Path) -> (Option<String>, Option<String>) {
     }
 
     // otherwise, grab lame number
-    let (vend, prod) = tokio::join! {
-        tokio::fs::read_to_string(path.join("idVendor")),
-        tokio::fs::read_to_string(path.join("idProduct")),
+    let (vend, prod) = futures::join! {
+        async_fs::read_to_string(path.join("idVendor")),
+        async_fs::read_to_string(path.join("idProduct")),
     };
 
     // trim whitespaces (newlines)

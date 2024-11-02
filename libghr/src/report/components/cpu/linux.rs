@@ -5,7 +5,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use tokio::fs;
+use async_fs as fs;
+use futures::TryStreamExt;
 
 use crate::prelude::internal::*;
 
@@ -279,7 +280,7 @@ async fn core_cache(sysfs_core_path: &Path) -> Vec<CoreCache> {
     };
 
     let mut caches: Vec<CoreCache> = Vec::new();
-    while let Ok(Some(cache)) = entries.next_entry().await {
+    while let Ok(Some(cache)) = entries.try_next().await {
         // only read if our path contains "index"
         let cache_path = cache.path();
         if !cache_path.to_string_lossy().contains("index") {
