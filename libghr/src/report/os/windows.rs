@@ -7,9 +7,7 @@ impl Report {
     /// Grabs operating system info for the hardware report.
     #[cfg(target_os = "windows")]
     pub(crate) async fn os_info() -> GhrResult<OperatingSystemInfo> {
-        let ver = tokio::task::spawn_blocking(windows_version::OsVersion::current)
-            .await
-            .unwrap();
+        let ver = blocking::unblock(windows_version::OsVersion::current).await;
 
         // use a simple env variable to grab this.
         // it's always around on Windows i guess!

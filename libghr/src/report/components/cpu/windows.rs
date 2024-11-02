@@ -105,6 +105,6 @@ mod tests {
         let path = PathBuf::from(format!("{root}/tests/assets/windows/cpu.json"));
 
         // load the query
-        serde_json::from_str(&tokio::fs::read_to_string(path).await.unwrap()).unwrap()
+        serde_json::from_str(&async_fs::read_to_string(path).await.unwrap()).unwrap()
     }
 }
