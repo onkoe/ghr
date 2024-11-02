@@ -73,3 +73,8 @@ pub fn log_location() -> PathBuf {
         .expect("the system should have a cache directory")
         .join(built_info::PKG_NAME)
 }
+
+/// Indicates the location of the 'latest' log file.
+pub fn latest_log_location() -> String {
+    log_location().join("ghr.latest.log").display().to_string()
+}
