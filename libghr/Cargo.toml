@@ -66,3 +66,4 @@ clap = { version = "4.5", features = ["derive"] }
 sevenz-rust = "0.6.1"
 time = "0.3.36"
 almost = "0.2.0"
+tracing-flame = "0.2.0"
