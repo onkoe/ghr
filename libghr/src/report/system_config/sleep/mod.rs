@@ -33,6 +33,7 @@ pub struct Sleep {
 }
 
 impl Default for Sleep {
+    #[tracing::instrument]
     fn default() -> Self {
         Self {
             s0: SleepMode::Unknown,

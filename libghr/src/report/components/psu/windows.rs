@@ -24,10 +24,12 @@ pub(crate) async fn get() -> GhrResult<Vec<ComponentInfo>> {
     Ok(all(query).await)
 }
 
+#[tracing::instrument]
 async fn all(query: Vec<HashMap<String, Variant>>) -> Vec<ComponentInfo> {
     futures::stream::iter(query).then(one).collect().await
 }
 
+#[tracing::instrument]
 async fn one(fields: HashMap<String, Variant>) -> ComponentInfo {
     // get name and vendor
     let name = fields.get("Name").and_then(|v| v.string_from_variant());

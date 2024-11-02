@@ -15,6 +15,8 @@ pub struct SystemConfInfo {
 }
 
 impl SystemConfInfo {
+    /// Gathers information about the system configuration.
+    #[tracing::instrument]
     pub async fn new() -> Self {
         // we'll get all info using heap-allocated futures.
         //

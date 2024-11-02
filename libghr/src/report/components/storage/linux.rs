@@ -351,6 +351,7 @@ mod tests {
         ))
     }
 
+    #[tracing::instrument]
     fn hdd_path() -> PathBuf {
         let root = env!("CARGO_MANIFEST_DIR");
         PathBuf::from(format!(
