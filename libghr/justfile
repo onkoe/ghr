@@ -1,5 +1,8 @@
 set windows-shell := ["C:\\Program Files\\Git\\bin\\sh.exe","-c"] 
 
+pre_push: check
+    clippy-tracing --action check
+
 # runs cargo check for windows and linux (x86_64).
 #
 # assumes targets are installed.
