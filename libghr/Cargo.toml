@@ -6,13 +6,16 @@ rust-version = "1.81"
 
 [dependencies]
 argon2 = "0.5.3"
-base64 = "0.22.1"
 chrono = { version = "0.4.38", default-features = false, features = [
     "alloc",
     "now",
     "serde",
 ] }
-futures = { version = "0.3.31", default-features = false, features = ["alloc", "async-await", "std"] }
+futures = { version = "0.3.31", default-features = false, features = [
+    "alloc",
+    "async-await",
+    "std",
+] }
 mac_address = { version = "1.1.7", features = ["serde"] }
 nvml-wrapper = "0.10.0"
 pisserror = "0.3.0-rc.1"
@@ -45,10 +48,7 @@ windows-version = "0.1.1"
 serde_json = "1.0.128"
 tokio = { version = "1.40.0", features = ["fs", "macros", "rt"] }
 tracing-subscriber = "0.3.18"
-reqwest = { version = "0.12", default-features = false, features = [
-    "json",
-    "rustls-tls",
-] }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
 whoami = { version = "1.5.2", default-features = false }
 rpassword = "7.3.1"
 clap = { version = "4.5", features = ["derive"] }
