@@ -56,3 +56,40 @@ struct SleepPaths {
     /// the path to `/sys/power/state`.
     state: PathBuf,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn check_states() {
+        let paths = SleepPaths {
+            state: sysfs_power_path().join("state"),
+        };
+
+        // grab our possible sleep states
+        let sleep = linux_sleep_info(&paths).await;
+
+        // https://www.kernel.org/doc/Documentation/power/states.txt
+        //
+        // - freeze: s0/software suspend
+        // - mem: currently unused.
+        // - disk: s4/hibernation
+
+        let expected = Sleep {
+            s0: SleepMode::Supported,
+            s1: SleepMode::Unsupported,
+            s3: SleepMode::Unsupported,
+            s4: SleepMode::Supported,
+            ..Default::default()
+        };
+
+        assert_eq!(expected, sleep);
+    }
+
+    #[tracing::instrument]
+    fn sysfs_power_path() -> PathBuf {
+        let root = env!("CARGO_MANIFEST_DIR");
+        PathBuf::from(format!("{root}/tests/assets/linux/sysfs/sys/power"))
+    }
+}
