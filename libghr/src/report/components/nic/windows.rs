@@ -26,14 +26,14 @@ pub(crate) async fn get() -> GhrResult<Vec<ComponentInfo>> {
 }
 
 /// finds info about the network devices represented by the given `wmi` query.
-#[tracing::instrument]
+#[tracing::instrument(skip(query))]
 async fn all(query: Vec<HashMap<String, Variant>>) -> Vec<ComponentInfo> {
     // map each into a componentinfo, if one is attainable
     futures::stream::iter(query).filter_map(one).collect().await
 }
 
 /// given one serialized entry from `wmi`, parses it into an nic repr.
-#[tracing::instrument]
+#[tracing::instrument(skip(fields))]
 async fn one(fields: HashMap<String, Variant>) -> Option<ComponentInfo> {
     // find its name and vendor
     let name = fields.get("Name").and_then(|v| v.string_from_variant());
