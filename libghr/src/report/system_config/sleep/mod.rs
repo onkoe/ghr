@@ -1,6 +1,6 @@
 use crate::prelude::internal::*;
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 mod linux;
 
 #[cfg(target_os = "windows")]
@@ -73,7 +73,7 @@ impl From<bool> for SleepMode {
 /// Gets information about supported ACPI sleep states.
 #[tracing::instrument]
 pub async fn get() -> Sleep {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     return linux::get().await;
 
     #[cfg(target_os = "windows")]

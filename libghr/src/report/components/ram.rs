@@ -25,7 +25,7 @@ pub struct RamDescription {
 }
 
 #[tracing::instrument]
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     use procfs::{Current, FromRead, Meminfo};
 

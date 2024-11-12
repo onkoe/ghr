@@ -3,7 +3,7 @@ use crate::prelude::internal::*;
 #[cfg(target_os = "windows")]
 mod windows;
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 mod linux;
 
 // official nvidia driver, NOT for `nouveau`
@@ -34,7 +34,7 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
         gpus.append(&mut nvidia_gpus);
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     if let Ok(mut linux_gpus) = linux::get().await {
         gpus.append(&mut linux_gpus);
     }

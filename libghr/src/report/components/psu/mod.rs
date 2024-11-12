@@ -1,6 +1,6 @@
 //! psu: power supply and battery info
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 mod linux;
 
 #[cfg(target_os = "windows")]
@@ -35,7 +35,7 @@ pub enum PowerSupplyDescription {
 
 #[tracing::instrument]
 pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     return linux::get().await;
 
     #[cfg(target_os = "windows")]

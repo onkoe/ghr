@@ -208,7 +208,7 @@ pub enum Removability {
 }
 
 // all this helps with accessing devices on linux
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 mod linux {
     use async_fs::DirEntry;
     use futures::StreamExt as _;

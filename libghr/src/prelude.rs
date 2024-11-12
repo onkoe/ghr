@@ -30,11 +30,11 @@ pub(crate) mod internal {
     pub(crate) use crate::report::components::windows::{get_wmi, VariantInto};
 
     // re-export `sysfs` helper on linux
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub(crate) use crate::report::components::pci::linux::{
         convert_to_pci_class, convert_to_pci_names,
     };
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub(crate) use crate::report::util::linux::{sysfs_value, sysfs_value_opt, Civ};
 
     // export logger creating fn for unit tests

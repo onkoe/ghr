@@ -2,15 +2,15 @@
 
 use crate::prelude::internal::*;
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 use futures::join;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 use futures::try_join;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 use std::path::Path;
 
 #[tracing::instrument]
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
     // grab info about usb devices and construct reprs
     let mut usb = Vec::new();
@@ -38,7 +38,7 @@ pub async fn get() -> GhrResult<Vec<ComponentInfo>> {
 }
 
 /// on Linux, this grabs the class codes for our devices.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 #[tracing::instrument]
 async fn usb_class(path: &Path) -> Option<String> {
     // read the files
@@ -69,7 +69,7 @@ async fn usb_class(path: &Path) -> Option<String> {
     return Some(format!("{} ({})", class, subclass));
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 #[tracing::instrument]
 async fn usb_vendor_and_id(path: &Path) -> (Option<String>, Option<String>) {
     // look for human-readable string repr

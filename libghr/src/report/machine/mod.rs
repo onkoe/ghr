@@ -33,7 +33,7 @@ pub struct MachineInfo {
 
 impl MachineInfo {
     #[tracing::instrument(skip(machine_id))]
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub async fn new(machine_id: MachineIdentifier) -> Self {
         use std::path::PathBuf;
 
@@ -81,7 +81,7 @@ impl MachineInfo {
     }
 
     #[tracing::instrument(skip(machine_id))]
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "android")))]
     pub async fn new(machine_id: MachineIdentifier) -> Self {
         // system vendor + model
         let vendor = None;
@@ -167,7 +167,7 @@ impl MachineIdentifier {
 
 impl Report {
     #[tracing::instrument]
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub async fn machine_info() -> MachineInfoReturnType {
         Ok(MachineInfo::new(MachineIdentifier::new_true()?).await)
     }
